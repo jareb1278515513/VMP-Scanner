@@ -1,50 +1,38 @@
 from __future__ import annotations
 
+import json
+import re
 import socket
 import ssl
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import lru_cache
+from pathlib import Path
 from dataclasses import asdict, dataclass
 from typing import Iterable
 from urllib.parse import urlparse
 
 
-COMMON_SERVICE_PORTS: dict[int, str] = {
-    21: "ftp",
-    22: "ssh",
-    25: "smtp",
-    53: "dns",
-    80: "http",
-    110: "pop3",
-    143: "imap",
-    443: "https",
-    465: "smtps",
-    587: "smtp",
-    993: "imaps",
-    995: "pop3s",
-    1433: "mssql",
-    1521: "oracle",
-    3306: "mysql",
-    3389: "rdp",
-    5432: "postgresql",
-    6379: "redis",
-    8080: "http",
-    8443: "https",
+CONFIDENCE_HIGH = "high"
+CONFIDENCE_MEDIUM = "medium"
+CONFIDENCE_LOW = "low"
+
+PROBE_FUNCTIONS = {
+    "http": "_probe_http",
+    "https": "_probe_https",
+    "ssh": "_probe_ssh",
+    "mysql": "_probe_mysql",
+    "redis": "_probe_redis",
+    "smtp": "_probe_smtp",
+    "database_banner": "_probe_database_banner",
 }
 
-SERVICE_HINTS: dict[str, str] = {
-    "server: nginx": "http",
-    "server: apache": "http",
-    "server: iis": "http",
-    "http/1.": "http",
-    "http/2": "http",
-    "ssh-": "ssh",
-    "mysql": "mysql",
-    "postgres": "postgresql",
-    "redis": "redis",
-    "smtp": "smtp",
-    "ftp": "ftp",
-}
+
+@dataclass(frozen=True)
+class ServiceDetection:
+    service: str
+    version: str | None
+    confidence: str
 
 
 @dataclass(frozen=True)
@@ -53,6 +41,8 @@ class PortScanResult:
     port: int
     status: str
     service_guess: str
+    service_version: str | None
+    confidence: str
     response_time_ms: float
     banner: str | None = None
 
@@ -127,15 +117,17 @@ def _scan_single_port(host: str, port: int, timeout: float, grab_banner: bool) -
 
     elapsed_ms = (time.perf_counter() - t0) * 1000
     if status == "open":
-        service_guess = _identify_service(host, port, timeout, banner)
+        detection = _identify_service(host, port, timeout, banner)
     else:
-        service_guess = "unknown"
+        detection = ServiceDetection("unknown", None, CONFIDENCE_LOW)
 
     return PortScanResult(
         host=host,
         port=port,
         status=status,
-        service_guess=service_guess,
+        service_guess=detection.service,
+        service_version=detection.version,
+        confidence=detection.confidence,
         response_time_ms=round(elapsed_ms, 3),
         banner=banner,
     )
@@ -152,59 +144,63 @@ def _read_banner(sock: socket.socket) -> str | None:
         return None
 
 
-def _identify_service(host: str, port: int, timeout: float, banner: str | None) -> str:
+def _identify_service(host: str, port: int, timeout: float, banner: str | None) -> ServiceDetection:
+    rules = _load_fingerprint_rules()
+
     from_banner = _guess_from_banner(banner)
     if from_banner:
         return from_banner
 
-    for probe in _probe_order_for_port(port):
+    for probe in _probe_order_for_port(port, rules):
         detected = probe(host, port, timeout)
         if detected:
             return detected
 
-    from_port = _guess_service_by_port(port)
+    from_port = _guess_service_by_port(port, rules)
     if from_port:
         return from_port
-    return "unknown"
+    return ServiceDetection("unknown", None, CONFIDENCE_LOW)
 
 
-def _guess_from_banner(banner: str | None) -> str | None:
+def _guess_from_banner(banner: str | None) -> ServiceDetection | None:
     if not banner:
         return None
+
+    rules = _load_fingerprint_rules()
     low = banner.lower()
-    for marker, service in SERVICE_HINTS.items():
+    for hint in rules["service_hints"]:
+        marker = hint.get("marker", "").lower()
+        service = hint.get("service", "unknown")
+        version_regex = hint.get("version_regex")
         if marker in low:
-            return service
+            version = _extract_version_from_text(banner, version_regex)
+            return ServiceDetection(service, version, CONFIDENCE_HIGH)
     return None
 
 
-def _probe_order_for_port(port: int) -> list:
-    if port in {80, 8080, 8000, 5000, 3000}:
-        return [_probe_http, _probe_https, _probe_ssh]
-    if port in {443, 8443}:
-        return [_probe_https, _probe_http]
-    if port == 22:
-        return [_probe_ssh]
-    if port == 3306:
-        return [_probe_mysql, _probe_http]
-    if port == 6379:
-        return [_probe_redis]
-    if port in {25, 465, 587}:
-        return [_probe_smtp]
-    if port in {5432, 1521, 1433}:
-        return [_probe_database_banner]
-    return [_probe_http, _probe_https, _probe_ssh, _probe_redis, _probe_smtp]
+def _probe_order_for_port(port: int, rules: dict) -> list:
+    probe_order_cfg = rules["probe_order"]
+    names = probe_order_cfg.get(str(port), probe_order_cfg.get("default", []))
+
+    functions: list = []
+    for name in names:
+        fn_name = PROBE_FUNCTIONS.get(name)
+        if fn_name and fn_name in globals():
+            functions.append(globals()[fn_name])
+    return functions
 
 
-def _probe_http(host: str, port: int, timeout: float) -> str | None:
+def _probe_http(host: str, port: int, timeout: float) -> ServiceDetection | None:
     payload = f"HEAD / HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n".encode()
     data = _send_and_recv_tcp(host, port, timeout, payload)
     if data.startswith(b"HTTP/") or b"Server:" in data:
-        return "http"
+        text = data.decode("utf-8", errors="replace")
+        version = _extract_version_from_http_header(text)
+        return ServiceDetection("http", version, CONFIDENCE_HIGH)
     return None
 
 
-def _probe_https(host: str, port: int, timeout: float) -> str | None:
+def _probe_https(host: str, port: int, timeout: float) -> ServiceDetection | None:
     context = ssl.create_default_context()
     context.check_hostname = False
     context.verify_mode = ssl.CERT_NONE
@@ -218,51 +214,59 @@ def _probe_https(host: str, port: int, timeout: float) -> str | None:
                 tls_sock.sendall(payload)
                 data = tls_sock.recv(256)
                 if data.startswith(b"HTTP/") or b"Server:" in data:
-                    return "https"
-                return "tls"
+                    text = data.decode("utf-8", errors="replace")
+                    version = _extract_version_from_http_header(text)
+                    return ServiceDetection("https", version, CONFIDENCE_HIGH)
+                return ServiceDetection("tls", None, CONFIDENCE_MEDIUM)
     except OSError:
         return None
 
 
-def _probe_ssh(host: str, port: int, timeout: float) -> str | None:
+def _probe_ssh(host: str, port: int, timeout: float) -> ServiceDetection | None:
     data = _send_and_recv_tcp(host, port, timeout, b"", recv_first=True)
     if data.startswith(b"SSH-"):
-        return "ssh"
+        text = data.decode("utf-8", errors="replace")
+        version = _extract_version_from_text(text, r"SSH-[\d.]+-([^\s]+)")
+        return ServiceDetection("ssh", version, CONFIDENCE_HIGH)
     return None
 
 
-def _probe_mysql(host: str, port: int, timeout: float) -> str | None:
+def _probe_mysql(host: str, port: int, timeout: float) -> ServiceDetection | None:
     data = _send_and_recv_tcp(host, port, timeout, b"", recv_first=True)
     if len(data) > 5 and data[4] == 0x0A:
-        return "mysql"
+        text = data.decode("utf-8", errors="replace")
+        version = _extract_version_from_text(text, r"(\d+\.\d+(?:\.\d+)*)")
+        return ServiceDetection("mysql", version, CONFIDENCE_HIGH)
     if b"mysql" in data.lower():
-        return "mysql"
+        return ServiceDetection("mysql", None, CONFIDENCE_MEDIUM)
     return None
 
 
-def _probe_redis(host: str, port: int, timeout: float) -> str | None:
+def _probe_redis(host: str, port: int, timeout: float) -> ServiceDetection | None:
     data = _send_and_recv_tcp(host, port, timeout, b"*1\r\n$4\r\nPING\r\n")
     if data.startswith(b"+PONG") or b"redis" in data.lower():
-        return "redis"
+        return ServiceDetection("redis", None, CONFIDENCE_HIGH)
     return None
 
 
-def _probe_smtp(host: str, port: int, timeout: float) -> str | None:
+def _probe_smtp(host: str, port: int, timeout: float) -> ServiceDetection | None:
     data = _send_and_recv_tcp(host, port, timeout, b"EHLO scanner\r\n", recv_first=True)
     if data.startswith(b"220") or b"smtp" in data.lower():
-        return "smtp"
+        text = data.decode("utf-8", errors="replace")
+        version = _extract_version_from_text(text, r"(?:ESMTP|SMTP)\s+([^\s]+)")
+        return ServiceDetection("smtp", version, CONFIDENCE_HIGH)
     return None
 
 
-def _probe_database_banner(host: str, port: int, timeout: float) -> str | None:
+def _probe_database_banner(host: str, port: int, timeout: float) -> ServiceDetection | None:
     data = _send_and_recv_tcp(host, port, timeout, b"", recv_first=True)
     low = data.lower()
     if b"postgres" in low:
-        return "postgresql"
+        return ServiceDetection("postgresql", None, CONFIDENCE_MEDIUM)
     if b"oracle" in low:
-        return "oracle"
+        return ServiceDetection("oracle", None, CONFIDENCE_MEDIUM)
     if b"sql server" in low or b"mssql" in low:
-        return "mssql"
+        return ServiceDetection("mssql", None, CONFIDENCE_MEDIUM)
     return None
 
 
@@ -287,13 +291,35 @@ def _send_and_recv_tcp(
         return b""
 
 
-def _guess_service_by_port(port: int) -> str | None:
-    if port in COMMON_SERVICE_PORTS:
-        return COMMON_SERVICE_PORTS[port]
+def _guess_service_by_port(port: int, rules: dict) -> ServiceDetection | None:
+    common_ports = rules["common_service_ports"]
+    if str(port) in common_ports:
+        return ServiceDetection(common_ports[str(port)], None, CONFIDENCE_LOW)
     try:
-        return socket.getservbyport(port, "tcp")
+        name = socket.getservbyport(port, "tcp")
+        return ServiceDetection(name, None, CONFIDENCE_LOW)
     except OSError:
         return None
+
+
+def _extract_version_from_http_header(text: str) -> str | None:
+    return _extract_version_from_text(text, r"Server:\s*[^/]+/([\w.\-]+)")
+
+
+def _extract_version_from_text(text: str, pattern: str | None) -> str | None:
+    if not pattern:
+        return None
+    match = re.search(pattern, text, flags=re.IGNORECASE)
+    if match:
+        return match.group(1)
+    return None
+
+
+@lru_cache(maxsize=1)
+def _load_fingerprint_rules() -> dict:
+    config_path = Path(__file__).with_name("service_fingerprints.json")
+    with config_path.open("r", encoding="utf-8") as fp:
+        return json.load(fp)
 
 
 def _parse_port_range(raw: str) -> tuple[int, int]:

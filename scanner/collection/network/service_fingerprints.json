@@ -1,0 +1,97 @@
+{
+  "common_service_ports": {
+    "21": "ftp",
+    "22": "ssh",
+    "25": "smtp",
+    "53": "dns",
+    "80": "http",
+    "110": "pop3",
+    "143": "imap",
+    "443": "https",
+    "465": "smtps",
+    "587": "smtp",
+    "993": "imaps",
+    "995": "pop3s",
+    "1433": "mssql",
+    "1521": "oracle",
+    "3306": "mysql",
+    "3389": "rdp",
+    "5432": "postgresql",
+    "6379": "redis",
+    "8080": "http",
+    "8443": "https"
+  },
+  "service_hints": [
+    {
+      "marker": "server: nginx",
+      "service": "http",
+      "version_regex": "nginx/([\\w.\\-]+)"
+    },
+    {
+      "marker": "server: apache",
+      "service": "http",
+      "version_regex": "apache/?([\\w.\\-]+)?"
+    },
+    {
+      "marker": "server: iis",
+      "service": "http",
+      "version_regex": "iis/?([\\w.\\-]+)?"
+    },
+    {
+      "marker": "http/1.",
+      "service": "http",
+      "version_regex": null
+    },
+    {
+      "marker": "http/2",
+      "service": "http",
+      "version_regex": null
+    },
+    {
+      "marker": "ssh-",
+      "service": "ssh",
+      "version_regex": "SSH-[\\d.]+-([^\\s]+)"
+    },
+    {
+      "marker": "mysql",
+      "service": "mysql",
+      "version_regex": "(\\d+\\.\\d+(?:\\.\\d+)*)"
+    },
+    {
+      "marker": "postgres",
+      "service": "postgresql",
+      "version_regex": null
+    },
+    {
+      "marker": "redis",
+      "service": "redis",
+      "version_regex": null
+    },
+    {
+      "marker": "smtp",
+      "service": "smtp",
+      "version_regex": "(?:ESMTP|SMTP)\\s+([^\\s]+)"
+    },
+    {
+      "marker": "ftp",
+      "service": "ftp",
+      "version_regex": null
+    }
+  ],
+  "probe_order": {
+    "80": ["http", "https", "ssh"],
+    "443": ["https", "http"],
+    "8080": ["http", "https", "ssh"],
+    "8443": ["https", "http"],
+    "22": ["ssh"],
+    "25": ["smtp"],
+    "465": ["smtp"],
+    "587": ["smtp"],
+    "3306": ["mysql", "http"],
+    "6379": ["redis"],
+    "1433": ["database_banner"],
+    "1521": ["database_banner"],
+    "5432": ["database_banner"],
+    "default": ["http", "https", "ssh", "redis", "smtp"]
+  }
+}

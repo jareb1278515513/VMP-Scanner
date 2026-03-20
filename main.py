@@ -111,7 +111,11 @@ def main() -> int:
         )
         if open_ports:
             open_port_text = ", ".join(
-                f"{item['port']}/{item['service_guess']}" for item in open_ports
+                (
+                    f"{item['port']}/{item['service_guess']}"
+                    f"(v={item['service_version'] or '-'},conf={item['confidence']})"
+                )
+                for item in open_ports
             )
             logging.info("Open ports: %s", open_port_text)
         else:
