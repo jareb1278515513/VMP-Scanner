@@ -4,6 +4,8 @@ import logging
 import time
 from dataclasses import asdict, dataclass
 
+from scanner.collection.network.scanner import normalize_target_host, parse_ports, scan_host_ports
+
 
 @dataclass(frozen=True)
 class DefaultConfig:
@@ -12,6 +14,9 @@ class DefaultConfig:
     max_depth: int = 2
     concurrency: int = 20
     timeout: float = 1.0
+    ports: str = "80,443,8080,3306"
+    port_range: str | None = None
+    grab_banner: bool = False
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -28,6 +33,13 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-depth", type=int, help="Crawler max depth")
     parser.add_argument("--concurrency", type=int, help="Worker concurrency")
     parser.add_argument("--timeout", type=float, help="Network timeout in seconds")
+    parser.add_argument("--ports", help="Comma-separated ports, for example 80,443,3306")
+    parser.add_argument("--port-range", help="Port range, for example 1-1024")
+    parser.add_argument(
+        "--grab-banner",
+        action="store_true",
+        help="Attempt to read lightweight service banners from open ports",
+    )
     parser.add_argument(
         "--log-level",
         default="INFO",
@@ -50,6 +62,13 @@ def load_runtime_config(args: argparse.Namespace) -> dict:
         config["concurrency"] = args.concurrency
     if args.timeout is not None:
         config["timeout"] = args.timeout
+    if args.ports is not None:
+        config["ports"] = args.ports
+    if args.port_range is not None:
+        config["port_range"] = args.port_range
+        config["ports"] = None
+    if args.grab_banner:
+        config["grab_banner"] = True
 
     return config
 
@@ -73,8 +92,31 @@ def main() -> int:
         runtime_config = load_runtime_config(args)
         logging.info("Runtime config: %s", json.dumps(runtime_config, ensure_ascii=False))
 
-        # Placeholder for future pipeline orchestration.
-        logging.info("Initialization completed")
+        target_host = normalize_target_host(runtime_config["target"])
+        port_list = parse_ports(runtime_config.get("ports"), runtime_config.get("port_range"))
+        scan_results = scan_host_ports(
+            host=target_host,
+            ports=port_list,
+            timeout=runtime_config["timeout"],
+            concurrency=runtime_config["concurrency"],
+            grab_banner=runtime_config["grab_banner"],
+        )
+
+        open_ports = [item for item in scan_results if item["status"] == "open"]
+        logging.info(
+            "Network scan completed: total=%d, open=%d, target=%s",
+            len(scan_results),
+            len(open_ports),
+            target_host,
+        )
+        if open_ports:
+            open_port_text = ", ".join(
+                f"{item['port']}/{item['service_guess']}" for item in open_ports
+            )
+            logging.info("Open ports: %s", open_port_text)
+        else:
+            logging.info("Open ports: none")
+        logging.debug("Network scan results: %s", json.dumps(scan_results, ensure_ascii=False))
         return 0
     except Exception as exc:
         logging.exception("Task failed: %s", exc)

@@ -29,15 +29,15 @@
 
 ### 1.2 网络探测引擎（Network Discovery Engine）
 
-- [ ] 实现单主机 TCP connect 扫描
-- [ ] 支持端口范围与端口列表两种输入
-- [ ] 支持并发扫描与超时控制
-- [ ] 输出端口状态（open/closed/filtered）
-- [ ] 可选实现轻量 banner 抓取
+- [x] 实现单主机 TCP connect 扫描
+- [x] 支持端口范围与端口列表两种输入
+- [x] 支持并发扫描与超时控制
+- [x] 输出端口状态（open/closed/filtered）
+- [x] 可选实现轻量 banner 抓取
 
 交付标准：
 - [ ] 对 DVWA 宿主机可识别开放端口（如 80）
-- [ ] 扫描结果可保存为结构化对象（JSON 可序列化）
+- [x] 扫描结果可保存为结构化对象（JSON 可序列化）
 
 ### 1.3 Web 状态感知爬虫引擎（Web Crawler Engine）
 
