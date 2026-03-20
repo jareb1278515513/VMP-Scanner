@@ -2,8 +2,8 @@
 
 ## 使用方式
 
-- [ ] 每完成一项就勾选，并在备注中记录 commit 或关键变更。
-- [ ] 所有功能任务都要附带最小可运行示例和测试记录。
+- 每完成一项就勾选，并在备注中记录 commit 或关键变更。
+- 所有功能任务都要附带最小可运行示例和测试记录。
 
 ## 里程碑总览
 
@@ -18,14 +18,14 @@
 
 ### 1.1 项目骨架与运行入口
 
-- [ ] 建立分层目录结构：scanner/collection、scanner/detection、scanner/assessment、scanner/presentation、tests
-- [ ] 在 main.py 实现参数入口（目标、模式、深度、并发、超时）
-- [ ] 统一配置加载（命令行参数 + 默认配置）
-- [ ] 输出最小运行日志（开始、结束、耗时、异常）
+- [x] 建立分层目录结构：scanner/collection、scanner/detection、scanner/assessment、scanner/presentation、tests
+- [x] 在 main.py 实现参数入口（目标、模式、深度、并发、超时）
+- [x] 统一配置加载（命令行参数 + 默认配置）
+- [x] 输出最小运行日志（开始、结束、耗时、异常）
 
 交付标准：
-- [ ] `uv run python main.py --help` 可正常显示参数
-- [ ] 运行后至少能输出任务初始化和结束日志
+- [x] `uv run python main.py --help` 可正常显示参数
+- [x] 运行后至少能输出任务初始化和结束日志
 
 ### 1.2 网络探测引擎（Network Discovery Engine）
 
