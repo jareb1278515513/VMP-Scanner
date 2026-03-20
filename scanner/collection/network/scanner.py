@@ -1,11 +1,50 @@
 from __future__ import annotations
 
 import socket
+import ssl
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from typing import Iterable
 from urllib.parse import urlparse
+
+
+COMMON_SERVICE_PORTS: dict[int, str] = {
+    21: "ftp",
+    22: "ssh",
+    25: "smtp",
+    53: "dns",
+    80: "http",
+    110: "pop3",
+    143: "imap",
+    443: "https",
+    465: "smtps",
+    587: "smtp",
+    993: "imaps",
+    995: "pop3s",
+    1433: "mssql",
+    1521: "oracle",
+    3306: "mysql",
+    3389: "rdp",
+    5432: "postgresql",
+    6379: "redis",
+    8080: "http",
+    8443: "https",
+}
+
+SERVICE_HINTS: dict[str, str] = {
+    "server: nginx": "http",
+    "server: apache": "http",
+    "server: iis": "http",
+    "http/1.": "http",
+    "http/2": "http",
+    "ssh-": "ssh",
+    "mysql": "mysql",
+    "postgres": "postgresql",
+    "redis": "redis",
+    "smtp": "smtp",
+    "ftp": "ftp",
+}
 
 
 @dataclass(frozen=True)
@@ -87,7 +126,10 @@ def _scan_single_port(host: str, port: int, timeout: float, grab_banner: bool) -
         status = "filtered"
 
     elapsed_ms = (time.perf_counter() - t0) * 1000
-    service_guess = _guess_service(port)
+    if status == "open":
+        service_guess = _identify_service(host, port, timeout, banner)
+    else:
+        service_guess = "unknown"
 
     return PortScanResult(
         host=host,
@@ -110,11 +152,148 @@ def _read_banner(sock: socket.socket) -> str | None:
         return None
 
 
-def _guess_service(port: int) -> str:
+def _identify_service(host: str, port: int, timeout: float, banner: str | None) -> str:
+    from_banner = _guess_from_banner(banner)
+    if from_banner:
+        return from_banner
+
+    for probe in _probe_order_for_port(port):
+        detected = probe(host, port, timeout)
+        if detected:
+            return detected
+
+    from_port = _guess_service_by_port(port)
+    if from_port:
+        return from_port
+    return "unknown"
+
+
+def _guess_from_banner(banner: str | None) -> str | None:
+    if not banner:
+        return None
+    low = banner.lower()
+    for marker, service in SERVICE_HINTS.items():
+        if marker in low:
+            return service
+    return None
+
+
+def _probe_order_for_port(port: int) -> list:
+    if port in {80, 8080, 8000, 5000, 3000}:
+        return [_probe_http, _probe_https, _probe_ssh]
+    if port in {443, 8443}:
+        return [_probe_https, _probe_http]
+    if port == 22:
+        return [_probe_ssh]
+    if port == 3306:
+        return [_probe_mysql, _probe_http]
+    if port == 6379:
+        return [_probe_redis]
+    if port in {25, 465, 587}:
+        return [_probe_smtp]
+    if port in {5432, 1521, 1433}:
+        return [_probe_database_banner]
+    return [_probe_http, _probe_https, _probe_ssh, _probe_redis, _probe_smtp]
+
+
+def _probe_http(host: str, port: int, timeout: float) -> str | None:
+    payload = f"HEAD / HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n".encode()
+    data = _send_and_recv_tcp(host, port, timeout, payload)
+    if data.startswith(b"HTTP/") or b"Server:" in data:
+        return "http"
+    return None
+
+
+def _probe_https(host: str, port: int, timeout: float) -> str | None:
+    context = ssl.create_default_context()
+    context.check_hostname = False
+    context.verify_mode = ssl.CERT_NONE
+    try:
+        with socket.create_connection((host, port), timeout=timeout) as raw_sock:
+            with context.wrap_socket(raw_sock, server_hostname=host) as tls_sock:
+                payload = (
+                    f"HEAD / HTTP/1.1\r\nHost: {host}\r\nConnection: close\r\n\r\n".encode()
+                )
+                tls_sock.settimeout(timeout)
+                tls_sock.sendall(payload)
+                data = tls_sock.recv(256)
+                if data.startswith(b"HTTP/") or b"Server:" in data:
+                    return "https"
+                return "tls"
+    except OSError:
+        return None
+
+
+def _probe_ssh(host: str, port: int, timeout: float) -> str | None:
+    data = _send_and_recv_tcp(host, port, timeout, b"", recv_first=True)
+    if data.startswith(b"SSH-"):
+        return "ssh"
+    return None
+
+
+def _probe_mysql(host: str, port: int, timeout: float) -> str | None:
+    data = _send_and_recv_tcp(host, port, timeout, b"", recv_first=True)
+    if len(data) > 5 and data[4] == 0x0A:
+        return "mysql"
+    if b"mysql" in data.lower():
+        return "mysql"
+    return None
+
+
+def _probe_redis(host: str, port: int, timeout: float) -> str | None:
+    data = _send_and_recv_tcp(host, port, timeout, b"*1\r\n$4\r\nPING\r\n")
+    if data.startswith(b"+PONG") or b"redis" in data.lower():
+        return "redis"
+    return None
+
+
+def _probe_smtp(host: str, port: int, timeout: float) -> str | None:
+    data = _send_and_recv_tcp(host, port, timeout, b"EHLO scanner\r\n", recv_first=True)
+    if data.startswith(b"220") or b"smtp" in data.lower():
+        return "smtp"
+    return None
+
+
+def _probe_database_banner(host: str, port: int, timeout: float) -> str | None:
+    data = _send_and_recv_tcp(host, port, timeout, b"", recv_first=True)
+    low = data.lower()
+    if b"postgres" in low:
+        return "postgresql"
+    if b"oracle" in low:
+        return "oracle"
+    if b"sql server" in low or b"mssql" in low:
+        return "mssql"
+    return None
+
+
+def _send_and_recv_tcp(
+    host: str,
+    port: int,
+    timeout: float,
+    payload: bytes,
+    recv_first: bool = False,
+) -> bytes:
+    try:
+        with socket.create_connection((host, port), timeout=timeout) as sock:
+            sock.settimeout(timeout)
+            if recv_first:
+                first = sock.recv(256)
+                if first:
+                    return first
+            if payload:
+                sock.sendall(payload)
+            return sock.recv(256)
+    except OSError:
+        return b""
+
+
+def _guess_service_by_port(port: int) -> str | None:
+    if port in COMMON_SERVICE_PORTS:
+        return COMMON_SERVICE_PORTS[port]
     try:
         return socket.getservbyport(port, "tcp")
     except OSError:
-        return "unknown"
+        return None
 
 
 def _parse_port_range(raw: str) -> tuple[int, int]:
