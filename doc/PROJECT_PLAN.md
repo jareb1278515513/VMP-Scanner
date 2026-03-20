@@ -191,14 +191,17 @@ VMP-Scanner：“可见、可测、可感”的网络扫描与漏洞检测系统
 建议目录（可按实际代码调整）：
 
 1. `main.py`：程序入口与任务编排。
-2. `scanner/network/`：端口扫描与服务探测。
-3. `scanner/crawler/`：爬虫、URL 与表单提取。
-4. `scanner/plugins/`：漏洞插件集合。
-5. `scanner/payloads/`：分漏洞类型维护 payload 字典与元数据。
-6. `scanner/assessment/`：风险评分与分级。
-7. `scanner/reporting/`：JSON/Markdown/CLI 输出。
-8. `tests/`：单元测试与集成测试。
-9. `doc/`：设计文档、样例报告与实验记录。
+2. `scanner/collection/`：采集层（资产发现）。
+3. `scanner/collection/network/`：网络探测引擎实现。
+4. `scanner/collection/crawler/`：Web 状态感知爬虫实现。
+5. `scanner/detection/`：漏洞探测层（插件调度与执行）。
+6. `scanner/detection/plugins/`：漏洞插件集合。
+7. `scanner/detection/payloads/`：分漏洞类型维护 payload 字典与元数据。
+8. `scanner/assessment/`：风险评估层（评分与分级）。
+9. `scanner/presentation/`：表现层（CLI 与报告输出）。
+10. `scanner/presentation/reporting/`：JSON/Markdown 报告渲染。
+11. `tests/`：单元测试与集成测试。
+12. `doc/`：设计文档、样例报告与实验记录。
 
 ## 8 开发计划与里程碑
 

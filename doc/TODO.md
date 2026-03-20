@@ -18,7 +18,7 @@
 
 ### 1.1 项目骨架与运行入口
 
-- [ ] 建立基础目录结构：scanner/network、scanner/crawler、scanner/common、tests
+- [ ] 建立分层目录结构：scanner/collection、scanner/detection、scanner/assessment、scanner/presentation、tests
 - [ ] 在 main.py 实现参数入口（目标、模式、深度、并发、超时）
 - [ ] 统一配置加载（命令行参数 + 默认配置）
 - [ ] 输出最小运行日志（开始、结束、耗时、异常）

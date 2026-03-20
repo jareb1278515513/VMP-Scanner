@@ -1,0 +1,1 @@
+"""Structured report rendering modules."""
