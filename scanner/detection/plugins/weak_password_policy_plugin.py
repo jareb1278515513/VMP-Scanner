@@ -43,6 +43,7 @@ class WeakPasswordPolicyPlugin(DetectionPlugin):
 
         findings: list[dict] = []
         session = requests.Session()
+        _apply_session_cookies(session, collection_bundle)
 
         for form in forms:
             if not _is_login_form(form):
@@ -65,6 +66,7 @@ class WeakPasswordPolicyPlugin(DetectionPlugin):
                             "method": str(form.get("method", "POST")).upper(),
                         },
                         "raw": {
+                            "mode": mode,
                             "assessment": "login_form_without_anti_automation_hint",
                             "field_names": field_names,
                         },
@@ -108,6 +110,7 @@ class WeakPasswordPolicyPlugin(DetectionPlugin):
                                 "param": username_field,
                             },
                             "raw": {
+                                "mode": mode,
                                 "credential": cred,
                                 "success_keyword": matched,
                                 "status": resp.status_code,
@@ -142,3 +145,10 @@ def _find_field_name(field_names: list[str], keywords: tuple[str, ...], fallback
         if any(keyword in lowered for keyword in keywords):
             return name
     return fallback
+
+
+def _apply_session_cookies(session: requests.Session, collection_bundle: dict) -> None:
+    metadata = collection_bundle.get("metadata") or {}
+    cookies = metadata.get("session_cookies") or {}
+    if isinstance(cookies, dict) and cookies:
+        session.cookies.update(cookies)

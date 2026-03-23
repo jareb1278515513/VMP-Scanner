@@ -6,6 +6,7 @@ import html
 import requests
 
 from scanner.detection.base import DetectionPlugin
+from scanner.detection.payloads import PayloadDictionaryManager
 
 
 class ReflectedXssPlugin(DetectionPlugin):
@@ -32,7 +33,20 @@ class ReflectedXssPlugin(DetectionPlugin):
         max_targets = int(plugin_options.get("max_targets", 3))
         timeout = float(plugin_options.get("timeout", 3.0))
         marker = str(plugin_options.get("marker", "vmpxssprobe"))
-        injection = f"<vmp>{marker}</vmp>"
+
+        manager = PayloadDictionaryManager()
+        payload_mode = "attack" if mode == "attack" else "test"
+        payloads = manager.load_payloads(
+            "xss",
+            mode=payload_mode,
+            include_high_risk=mode == "attack",
+            include_disabled=mode == "attack",
+        )
+        selected = _pick_xss_payload(payloads, mode=mode)
+        selected_payload = selected.get("payload") if selected else ""
+        selected_payload_id = selected.get("id") if selected else None
+        selected_payload_source = selected.get("source") if selected else None
+        injection = _build_injection(selected_payload, marker, mode)
 
         findings: list[dict] = []
         session = requests.Session()
@@ -49,29 +63,45 @@ class ReflectedXssPlugin(DetectionPlugin):
                 continue
 
             body = resp.text or ""
-            contains_raw = injection in body
-            escaped_injection = html.escape(injection)
-            contains_escaped = escaped_injection in body
+            marker_l = marker.lower()
+            body_l = body.lower()
+            escaped_marker_l = html.escape(marker).lower()
 
-            if not (contains_raw or contains_escaped):
+            contains_marker = marker_l in body_l
+            contains_escaped = escaped_marker_l in body_l
+            contains_raw = contains_marker and not contains_escaped
+
+            if mode == "attack":
+                executable_pattern = "<script>" in body and marker in body
+                if not executable_pattern:
+                    continue
+            else:
+                executable_pattern = False
+
+            if mode != "attack" and not (contains_raw or contains_escaped):
                 continue
 
             findings.append(
                 {
-                    "title": "Potential reflected XSS behavior",
-                    "severity_hint": "high" if contains_raw else "medium",
-                    "confidence": 0.88 if contains_raw else 0.7,
+                    "title": "Reflected XSS executable payload echoed" if mode == "attack" else "Potential reflected XSS behavior",
+                    "severity_hint": "high" if (contains_raw or executable_pattern) else "medium",
+                    "confidence": 0.92 if executable_pattern else (0.88 if contains_raw else 0.7),
                     "location": {
                         "url": base_url,
                         "method": "GET",
                         "param": target_param,
                     },
                     "raw": {
+                        "mode": mode,
                         "probe_url": probe_url,
                         "status": resp.status_code,
                         "marker": marker,
+                        "payload": injection,
+                        "payload_id": selected_payload_id,
+                        "payload_source": selected_payload_source,
                         "contains_raw": contains_raw,
                         "contains_escaped": contains_escaped,
+                        "executable_pattern": executable_pattern,
                     },
                 }
             )
@@ -80,6 +110,9 @@ class ReflectedXssPlugin(DetectionPlugin):
 
     def verify(self, candidate: dict, collection_bundle: dict) -> bool:
         raw = candidate.get("raw") or {}
+        mode = raw.get("mode", "test")
+        if mode == "attack":
+            return bool(raw.get("executable_pattern"))
         return bool(raw.get("contains_raw") or raw.get("contains_escaped"))
 
     def evidence(self, candidate: dict) -> dict:
@@ -135,3 +168,39 @@ def _apply_session_cookies(session: requests.Session, collection_bundle: dict) -
     cookies = metadata.get("session_cookies") or {}
     if isinstance(cookies, dict) and cookies:
         session.cookies.update(cookies)
+
+
+def _pick_xss_payload(payloads: list[dict], mode: str) -> dict | None:
+    for item in payloads:
+        payload = str(item.get("payload") or "")
+        lowered = payload.lower()
+        if mode == "attack":
+            if "<script" in lowered or "onerror" in lowered or "onload" in lowered:
+                return item
+        else:
+            if "http://" in lowered or "https://" in lowered:
+                continue
+            if "fetch(" in lowered:
+                continue
+            if "document.cookie" in lowered:
+                continue
+            if "<" in payload and ">" in payload and len(payload) <= 200:
+                return item
+
+    return payloads[0] if payloads else None
+
+
+def _build_injection(payload: str, marker: str, mode: str) -> str:
+    if not payload:
+        return f"<script>console.log('{marker}')</script>" if mode == "attack" else f"<vmp>{marker}</vmp>"
+
+    if marker in payload:
+        return payload
+
+    if mode == "attack" and "<script" in payload.lower() and "</script>" in payload.lower():
+        return payload.replace("</script>", f"/*{marker}*/</script>", 1)
+
+    if mode == "detect" or mode == "test":
+        return f"{payload}<!--{marker}-->"
+
+    return f"{payload} {marker}"

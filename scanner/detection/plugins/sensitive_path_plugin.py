@@ -46,7 +46,12 @@ class SensitivePathPlugin(DetectionPlugin):
         max_paths = int(plugin_options.get("max_paths", 20))
 
         manager = PayloadDictionaryManager()
-        payloads = manager.load_payloads("path_traversal", mode="test")
+        payloads = manager.load_payloads(
+            "path_traversal",
+            mode="attack" if mode == "attack" else "test",
+            include_high_risk=mode == "attack",
+            include_disabled=mode == "attack",
+        )
 
         candidates = list(SENSITIVE_PATH_HINTS)
         candidates.extend(_extract_path_candidates(payloads))
@@ -65,6 +70,7 @@ class SensitivePathPlugin(DetectionPlugin):
 
         findings: list[dict] = []
         session = requests.Session()
+        _apply_session_cookies(session, collection_bundle)
 
         for path in deduped:
             probe_url = urljoin(base_url.rstrip("/") + "/", path.lstrip("/"))
@@ -80,18 +86,22 @@ class SensitivePathPlugin(DetectionPlugin):
             if resp.status_code == 200 and "not found" in body[:300]:
                 continue
 
+            attack_feature = _extract_sensitive_feature(resp.text or "") if mode == "attack" else None
+
             findings.append(
                 {
-                    "title": "Sensitive path is exposed",
+                    "title": "Sensitive path disclosure confirmed" if mode == "attack" else "Sensitive path is exposed",
                     "severity_hint": "high" if resp.status_code == 200 else "medium",
-                    "confidence": 0.85 if resp.status_code == 200 else 0.68,
+                    "confidence": 0.92 if attack_feature else (0.85 if resp.status_code == 200 else 0.68),
                     "location": {
                         "url": probe_url,
                         "method": "GET",
                     },
                     "raw": {
+                        "mode": mode,
                         "status": resp.status_code,
                         "path": path,
+                        "attack_feature": attack_feature,
                         "content_preview": (resp.text or "")[:200],
                     },
                 }
@@ -129,3 +139,25 @@ def _normalize_path(path: str) -> str:
     if not normalized.startswith("/"):
         normalized = "/" + normalized
     return normalized
+
+
+def _extract_sensitive_feature(body: str) -> str | None:
+    lowered = body.lower()
+    markers = (
+        "root:x:0:0",
+        "[extensions]",
+        "db_password",
+        "api_key",
+        "phpinfo",
+    )
+    for marker in markers:
+        if marker in lowered:
+            return marker
+    return None
+
+
+def _apply_session_cookies(session: requests.Session, collection_bundle: dict) -> None:
+    metadata = collection_bundle.get("metadata") or {}
+    cookies = metadata.get("session_cookies") or {}
+    if isinstance(cookies, dict) and cookies:
+        session.cookies.update(cookies)

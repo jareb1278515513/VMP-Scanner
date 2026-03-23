@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from main import build_detection_metadata, resolve_enabled_plugins
+import argparse
+
+from main import build_detection_metadata, load_runtime_config, resolve_enabled_plugins
 
 
 def test_build_detection_metadata_supports_global_and_per_plugin_overrides() -> None:
@@ -47,3 +49,44 @@ def test_resolve_enabled_plugins_returns_none_when_not_configured() -> None:
     available = ["a", "b"]
     runtime_config = {}
     assert resolve_enabled_plugins(runtime_config, available) is None
+
+
+def test_load_runtime_config_normalizes_detect_mode_alias() -> None:
+    args = argparse.Namespace(
+        target=None,
+        mode="detect",
+        max_depth=None,
+        concurrency=None,
+        timeout=None,
+        ports=None,
+        port_range=None,
+        allowed_domains=None,
+        cookie=None,
+        auto_login=False,
+        auth_login_url=None,
+        auth_username="admin",
+        auth_password="password",
+        auth_username_field="username",
+        auth_password_field="password",
+        auth_csrf_field="user_token",
+        auth_submit_field=None,
+        auth_submit_value=None,
+        auth_success_keyword=None,
+        auth_extra=None,
+        sync_payloads=False,
+        payload_sync_ref="master",
+        payload_sync_max_per_category=200,
+        payload_sync_timeout=20.0,
+        payload_sync_incremental=False,
+        enable_plugins=None,
+        disable_plugins=None,
+        detection_plugin_timeout=None,
+        detection_plugin_max_targets=None,
+        plugin_timeout=None,
+        plugin_max_targets=None,
+        crawler_output_json=None,
+        grab_banner=False,
+    )
+
+    config = load_runtime_config(args)
+    assert config["mode"] == "test"

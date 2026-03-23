@@ -13,7 +13,7 @@ from scanner.detection.payloads import sync_from_open_source
 @dataclass(frozen=True)
 class DefaultConfig:
     target: str = "127.0.0.1"
-    mode: str = "test"
+    mode: str = "detect"
     max_depth: int = 2
     concurrency: int = 20
     timeout: float = 1.0
@@ -55,8 +55,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--target", help="Target host or URL")
     parser.add_argument(
         "--mode",
-        choices=("test", "attack"),
-        help="Run mode: test (safe) or attack (aggressive)",
+        choices=("detect", "test", "attack"),
+        help="Run mode: detect/test (vulnerability detection) or attack (active exploitation)",
     )
     parser.add_argument("--max-depth", type=int, help="Crawler max depth")
     parser.add_argument("--concurrency", type=int, help="Worker concurrency")
@@ -207,7 +207,7 @@ def load_runtime_config(args: argparse.Namespace) -> dict:
     if args.target:
         config["target"] = args.target
     if args.mode:
-        config["mode"] = args.mode
+        config["mode"] = "test" if args.mode == "detect" else args.mode
     if args.max_depth is not None:
         config["max_depth"] = args.max_depth
     if args.concurrency is not None:

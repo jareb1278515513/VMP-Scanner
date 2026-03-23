@@ -37,8 +37,15 @@ class SqlInjectionPlugin(DetectionPlugin):
             return []
 
         manager = PayloadDictionaryManager()
-        payloads = manager.load_payloads("sqli", mode="test")
+        payload_mode = "attack" if mode == "attack" else "test"
+        payloads = manager.load_payloads(
+            "sqli",
+            mode=payload_mode,
+            include_high_risk=mode == "attack",
+            include_disabled=mode == "attack",
+        )
         true_payload, false_payload = _pick_boolean_pair(payloads)
+        exploit_payload = _pick_attack_payload(payloads)
 
         metadata = collection_bundle.get("metadata") or {}
         plugin_options = (metadata.get("detection") or {}).get("sqli", {})
@@ -73,10 +80,23 @@ class SqlInjectionPlugin(DetectionPlugin):
             if not error_marker and not bool_diff:
                 continue
 
+            attack_probe_url = None
+            attack_status = None
+            attack_feature = None
+            if mode == "attack" and exploit_payload:
+                attack_probe_url = _with_param(base_url, target_param, exploit_payload)
+                try:
+                    attack_resp = session.get(attack_probe_url, timeout=timeout, allow_redirects=True)
+                    attack_status = attack_resp.status_code
+                    attack_feature = _extract_attack_feature(attack_resp.text or "")
+                except requests.RequestException:
+                    attack_status = None
+                    attack_feature = None
+
             confidence = 0.9 if error_marker else 0.78
             findings.append(
                 {
-                    "title": "Potential SQL injection behavior",
+                    "title": "SQL injection confirmed" if mode == "attack" else "Potential SQL injection behavior",
                     "severity_hint": "high" if error_marker else "medium",
                     "confidence": confidence,
                     "location": {
@@ -85,6 +105,7 @@ class SqlInjectionPlugin(DetectionPlugin):
                         "param": target_param,
                     },
                     "raw": {
+                        "mode": mode,
                         "true_probe_url": true_url,
                         "false_probe_url": false_url,
                         "true_status": true_resp.status_code,
@@ -93,9 +114,13 @@ class SqlInjectionPlugin(DetectionPlugin):
                         "false_length": len_false,
                         "error_marker": error_marker,
                         "boolean_diff": bool_diff,
+                        "attack_probe_url": attack_probe_url,
+                        "attack_status": attack_status,
+                        "attack_feature": attack_feature,
                         "used_payloads": {
                             "true": true_payload,
                             "false": false_payload,
+                            "attack": exploit_payload,
                         },
                     },
                 }
@@ -132,6 +157,30 @@ def _with_param(url: str, name: str, value: str) -> str:
     query[name] = [value]
     new_query = urlencode(query, doseq=True)
     return urlunparse(parsed._replace(query=new_query))
+
+
+def _pick_attack_payload(payloads: list[dict]) -> str | None:
+    for item in payloads:
+        payload = str(item.get("payload") or "")
+        lowered = payload.lower()
+        if "union" in lowered or "information_schema" in lowered or "version()" in lowered:
+            return payload
+    return None
+
+
+def _extract_attack_feature(body: str) -> str | None:
+    lowered = body.lower()
+    markers = (
+        "information_schema",
+        "version",
+        "database",
+        "mysql",
+        "root:x:0:0",
+    )
+    for marker in markers:
+        if marker in lowered:
+            return marker
+    return None
 
 
 def _build_probe_targets(collection_bundle: dict) -> list[dict]:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from scanner.detection.base import DetectionPlugin
+from scanner.detection.payloads import PayloadDictionaryManager
 
 
 class CsrfMissingTokenPlugin(DetectionPlugin):
@@ -19,22 +20,50 @@ class CsrfMissingTokenPlugin(DetectionPlugin):
 
     def probe(self, collection_bundle: dict, mode: str) -> list[dict]:
         web_assets = collection_bundle.get("web_assets") or {}
+        manager = PayloadDictionaryManager()
+        payloads = manager.load_payloads(
+            "csrf",
+            mode="attack" if mode == "attack" else "test",
+            include_high_risk=mode == "attack",
+            include_disabled=mode == "attack",
+        )
+        payload_samples = [str(item.get("payload") or "") for item in payloads[:3]]
+        payload_ids = [str(item.get("id") or "") for item in payloads[:3] if str(item.get("id") or "")]
+
         findings: list[dict] = []
         for form in web_assets.get("forms", []):
             method = str(form.get("method", "GET")).upper()
             has_csrf = bool(form.get("has_csrf_token", False))
             if method == "POST" and not has_csrf:
+                field_names = [
+                    str(item.get("name") or "")
+                    for item in form.get("fields", [])
+                    if str(item.get("name") or "")
+                ]
+                forged_post = {name: "ATTACK_PLACEHOLDER" for name in field_names}
                 findings.append(
                     {
-                        "title": "Form may miss CSRF token",
-                        "severity_hint": "medium",
-                        "confidence": 0.7,
+                        "title": "CSRF attack may be forgeable" if mode == "attack" else "Form may miss CSRF token",
+                        "severity_hint": "high" if mode == "attack" else "medium",
+                        "confidence": 0.85 if mode == "attack" else 0.7,
                         "location": {
                             "url": form.get("page_url"),
                             "method": method,
                             "param": "csrf_token",
                         },
-                        "raw": form,
+                        "raw": {
+                            "mode": mode,
+                            "form": form,
+                            "attack_poc": {
+                                "target": form.get("action") or form.get("page_url"),
+                                "method": method,
+                                "forged_post": forged_post,
+                                "payload_samples": payload_samples,
+                                "payload_ids": payload_ids,
+                            },
+                            "payload_samples": payload_samples,
+                            "payload_ids": payload_ids,
+                        },
                     }
                 )
         return findings
@@ -45,9 +74,14 @@ class CsrfMissingTokenPlugin(DetectionPlugin):
 
     def evidence(self, candidate: dict) -> dict:
         raw = candidate.get("raw") or {}
+        form = raw.get("form") or {}
         return {
-            "form_action": raw.get("action"),
-            "form_method": raw.get("method"),
-            "fields": raw.get("fields", []),
-            "has_csrf_token": raw.get("has_csrf_token"),
+            "mode": raw.get("mode"),
+            "form_action": form.get("action"),
+            "form_method": form.get("method"),
+            "fields": form.get("fields", []),
+            "has_csrf_token": form.get("has_csrf_token"),
+            "payload_ids": raw.get("payload_ids", []),
+            "payload_samples": raw.get("payload_samples", []),
+            "attack_poc": raw.get("attack_poc"),
         }
