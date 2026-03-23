@@ -9,6 +9,10 @@ from scanner.assessment import AssessmentService
 from scanner.collection import CollectionService
 from scanner.detection import DetectionService
 from scanner.detection.payloads import sync_from_open_source
+from scanner.presentation import PresentationService
+
+
+TOOL_VERSION = "0.1.0"
 
 
 @dataclass(frozen=True)
@@ -45,6 +49,8 @@ class DefaultConfig:
     plugin_timeout: list[str] | None = None
     plugin_max_targets: list[str] | None = None
     crawler_output_json: str | None = None
+    report_json: str | None = None
+    report_markdown: str | None = None
     grab_banner: bool = False
 
 
@@ -189,6 +195,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Write crawler report JSON to this path",
     )
     parser.add_argument(
+        "--report-json",
+        help="Write full risk report JSON to this path",
+    )
+    parser.add_argument(
+        "--report-markdown",
+        help="Write full risk report Markdown to this path",
+    )
+    parser.add_argument(
         "--grab-banner",
         action="store_true",
         help="Attempt to read lightweight service banners from open ports",
@@ -270,6 +284,10 @@ def load_runtime_config(args: argparse.Namespace) -> dict:
         config["plugin_max_targets"] = args.plugin_max_targets
     if args.crawler_output_json is not None:
         config["crawler_output_json"] = args.crawler_output_json
+    if getattr(args, "report_json", None) is not None:
+        config["report_json"] = args.report_json
+    if getattr(args, "report_markdown", None) is not None:
+        config["report_markdown"] = args.report_markdown
     if args.grab_banner:
         config["grab_banner"] = True
 
@@ -437,6 +455,7 @@ def main() -> int:
                 },
                 "metadata": {
                     "tool": "vmp-scanner",
+                    "tool_version": TOOL_VERSION,
                     "entrypoint": "main.py",
                     "detection": detection_metadata,
                 },
@@ -534,6 +553,29 @@ def main() -> int:
         if risk_bundle.get("errors"):
             logging.warning("Assessment layer warnings: %s", risk_bundle["errors"])
         logging.debug("Risk bundle: %s", json.dumps(risk_bundle, ensure_ascii=False))
+
+        if runtime_config.get("report_json") or runtime_config.get("report_markdown"):
+            presentation_service = PresentationService()
+            render_result = presentation_service.render(
+                {
+                    "collection": collection_bundle,
+                    "findings": finding_bundle,
+                    "risks": risk_bundle,
+                    "output": {
+                        "json_path": runtime_config.get("report_json"),
+                        "markdown_path": runtime_config.get("report_markdown"),
+                    },
+                    "metadata": {
+                        "mode": runtime_config["mode"],
+                        "tool_version": TOOL_VERSION,
+                        "args": runtime_config,
+                    },
+                }
+            )
+            if render_result.get("json_path"):
+                logging.info("Risk JSON report written to: %s", render_result["json_path"])
+            if render_result.get("markdown_path"):
+                logging.info("Risk Markdown report written to: %s", render_result["markdown_path"])
 
         return 0
     except Exception as exc:
