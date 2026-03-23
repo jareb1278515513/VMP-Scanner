@@ -6,7 +6,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from scanner.collection import CollectionService
-from scanner.detection import DetectionExecutor
+from scanner.detection import DetectionService
 from scanner.detection.payloads import sync_from_open_source
 
 
@@ -488,19 +488,20 @@ def main() -> int:
             logging.warning("Collection layer warnings: %s", collection_bundle["errors"])
         logging.debug("Collection bundle: %s", json.dumps(collection_bundle, ensure_ascii=False))
 
-        detection_executor = DetectionExecutor()
-        available_plugins = [
-            plugin.metadata().get("name", plugin.__class__.__name__)
-            for plugin in detection_executor.registry.list_plugins()
-        ]
+        detection_service = DetectionService()
+        available_plugins = detection_service.list_available_plugins()
         enabled_plugins = resolve_enabled_plugins(runtime_config, available_plugins)
         if enabled_plugins is not None:
             logging.info("Enabled detection plugins: %s", enabled_plugins)
 
-        finding_bundle = detection_executor.run(
-            collection_bundle=collection_bundle,
-            mode=runtime_config["mode"],
-            enabled_plugins=enabled_plugins,
+        finding_bundle = detection_service.detect(
+            {
+                "mode": runtime_config["mode"],
+                "collection": collection_bundle,
+                "plugin_policy": {
+                    "enabled_plugins": enabled_plugins,
+                },
+            }
         )
         logging.info(
             "Detection completed: findings=%d, plugins(total=%d, success=%d, failed=%d, skipped=%d)",
