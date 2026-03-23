@@ -116,6 +116,6 @@ def test_presentation_service_renders_json_and_markdown(tmp_path: Path) -> None:
     assert "Reflected XSS suspected" in markdown
 
     html_doc = html_path.read_text(encoding="utf-8")
-    assert "Security Risk Intelligence" in html_doc
+    assert "安全风险总览" in html_doc
     assert "id=\"riskBody\"" in html_doc
-    assert "filtered-risk-items.json" in html_doc
+    assert "筛选后的风险条目.json" in html_doc

@@ -177,11 +177,11 @@ class PresentationService:
         web_summary = assets.get("web_summary") or {}
 
         return f"""<!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VMP Report</title>
+  <title>VMP 安全风险报告</title>
   <style>
     :root {{
       --bg: #f5f5f7;
@@ -253,61 +253,61 @@ class PresentationService:
 <body>
   <div class="wrap">
     <section class="hero">
-      <h1>Security Risk Intelligence</h1>
-      <div class="sub">Target: {target}</div>
+      <h1>安全风险总览 <span style="font-weight:500;color:#6e6e73;">Security Intelligence</span></h1>
+      <div class="sub">目标 Target: {target}</div>
       <div class="chips">
-        <span class="chip">Generated: {generated_at}</span>
-        <span class="chip">Mode: {mode}</span>
-        <span class="chip">Version: {tool_version}</span>
+        <span class="chip">生成时间 Generated: {generated_at}</span>
+        <span class="chip">模式 Mode: {mode}</span>
+        <span class="chip">版本 Version: {tool_version}</span>
       </div>
       <div class="metrics">
-        <div class="metric"><div class="k">Findings</div><div class="v" id="metric-findings">{int(vulnerabilities.get('total', 0))}</div></div>
-        <div class="metric"><div class="k">Risks</div><div class="v" id="metric-risks">{len(risks)}</div></div>
+        <div class="metric"><div class="k">发现 Findings</div><div class="v" id="metric-findings">{int(vulnerabilities.get('total', 0))}</div></div>
+        <div class="metric"><div class="k">风险 Risks</div><div class="v" id="metric-risks">{len(risks)}</div></div>
         <div class="metric"><div class="k">Critical</div><div class="v">{int(summary.get('critical', 0))}</div></div>
         <div class="metric"><div class="k">High</div><div class="v">{int(summary.get('high', 0))}</div></div>
-        <div class="metric"><div class="k">Open Ports</div><div class="v">{int(network_summary.get('open_ports', 0))}</div></div>
-        <div class="metric"><div class="k">URLs</div><div class="v">{int(web_summary.get('urls', 0))}</div></div>
+        <div class="metric"><div class="k">开放端口 Open Ports</div><div class="v">{int(network_summary.get('open_ports', 0))}</div></div>
+        <div class="metric"><div class="k">页面 URL</div><div class="v">{int(web_summary.get('urls', 0))}</div></div>
       </div>
     </section>
 
     <section class="controls">
-      <input id="searchInput" class="input" placeholder="Search title/category/plugin/url" />
-      <select id="levelSelect" class="select"><option value="">All Levels</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
-      <select id="categorySelect" class="select"><option value="">All Categories</option></select>
-      <select id="pluginSelect" class="select"><option value="">All Plugins</option></select>
+      <input id="searchInput" class="input" placeholder="搜索标题、分类、插件或 URL" />
+      <select id="levelSelect" class="select"><option value="">全部等级</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
+      <select id="categorySelect" class="select"><option value="">全部分类</option></select>
+      <select id="pluginSelect" class="select"><option value="">全部插件</option></select>
     </section>
 
     <section class="grid">
       <article class="panel">
-        <div class="panel-head"><span>Risk Items</span><span id="rowCounter">0 items</span></div>
+        <div class="panel-head"><span>风险条目 Risk Items</span><span id="rowCounter">0 条</span></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Level</th><th>Score</th><th>Category</th><th>Plugin</th><th>Title</th><th>URL</th></tr></thead>
+            <thead><tr><th>等级 Level</th><th>分数 Score</th><th>分类 Category</th><th>插件 Plugin</th><th>标题 Title</th><th>位置 URL</th></tr></thead>
             <tbody id="riskBody"></tbody>
           </table>
         </div>
       </article>
 
       <aside class="panel">
-        <div class="panel-head">Risk Distribution</div>
+        <div class="panel-head">风险分布 Risk Distribution</div>
         <div class="plot">
-          <div class="ring" id="ring"><div class="ring-t"><div><strong id="ringTotal">0</strong>Total Risks</div></div></div>
+          <div class="ring" id="ring"><div class="ring-t"><div><strong id="ringTotal">0</strong>总风险数</div></div></div>
           <div class="legend" id="legend"></div>
-          <button class="btn" id="exportBtn">Export Filtered JSON</button>
+          <button class="btn" id="exportBtn">导出筛选结果 JSON</button>
         </div>
       </aside>
     </section>
   </div>
 
   <aside id="drawer" class="drawer">
-    <button id="closeDrawer">Close</button>
-    <h2 id="detailTitle">Risk Detail</h2>
+    <button id="closeDrawer">关闭</button>
+    <h2 id="detailTitle">风险详情</h2>
     <p id="detailMeta"></p>
-    <h4>Recommendation</h4>
+    <h4>修复建议 Recommendation</h4>
     <div id="detailRecommendation" class="kv"></div>
-    <h4>Retest</h4>
+    <h4>复测建议 Retest</h4>
     <div id="detailRetest" class="kv"></div>
-    <h4>Evidence</h4>
+    <h4>证据 Evidence</h4>
     <div id="detailEvidence" class="kv"></div>
   </aside>
 
@@ -370,7 +370,7 @@ class PresentationService:
     }}
 
     function showDetail(item) {{
-      document.getElementById('detailTitle').textContent = item?.title || 'Risk Detail';
+      document.getElementById('detailTitle').textContent = item?.title || '风险详情';
       document.getElementById('detailMeta').textContent = `${{item?.level || '-'}} · ${{item?.category || '-'}} · score=${{Number(item?.score || 0).toFixed(2)}}`;
       document.getElementById('detailRecommendation').textContent = item?.recommendation || '-';
       document.getElementById('detailRetest').textContent = item?.retest || '-';
@@ -394,7 +394,7 @@ class PresentationService:
         row.addEventListener('click', () => showDetail(item));
         riskBody.appendChild(row);
       }}
-      rowCounter.textContent = `${{items.length}} items`;
+      rowCounter.textContent = `${{items.length}} 条`;
       metricFindings.textContent = String(items.length);
       metricRisks.textContent = String(items.length);
     }}
@@ -438,7 +438,7 @@ class PresentationService:
       const blob = new Blob([JSON.stringify(items, null, 2)], {{ type: 'application/json' }});
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = 'filtered-risk-items.json';
+      link.download = '筛选后的风险条目.json';
       link.click();
       URL.revokeObjectURL(link.href);
     }});
