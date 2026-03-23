@@ -5,6 +5,7 @@ import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from scanner.assessment import AssessmentService
 from scanner.collection import CollectionService
 from scanner.detection import DetectionService
 from scanner.detection.payloads import sync_from_open_source
@@ -514,6 +515,25 @@ def main() -> int:
         if finding_bundle.get("errors"):
             logging.warning("Detection layer warnings: %s", finding_bundle["errors"])
         logging.debug("Finding bundle: %s", json.dumps(finding_bundle, ensure_ascii=False))
+
+        assessment_service = AssessmentService()
+        risk_bundle = assessment_service.assess(
+            {
+                "findings": finding_bundle,
+            }
+        )
+        summary = risk_bundle["summary"]
+        logging.info(
+            "Assessment completed: risks=%d, critical=%d, high=%d, medium=%d, low=%d",
+            len(risk_bundle["risk_items"]),
+            summary["critical"],
+            summary["high"],
+            summary["medium"],
+            summary["low"],
+        )
+        if risk_bundle.get("errors"):
+            logging.warning("Assessment layer warnings: %s", risk_bundle["errors"])
+        logging.debug("Risk bundle: %s", json.dumps(risk_bundle, ensure_ascii=False))
 
         return 0
     except Exception as exc:

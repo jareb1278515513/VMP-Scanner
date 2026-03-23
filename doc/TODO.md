@@ -110,15 +110,15 @@
 
 ### 3.1 风险评估模型
 
-- [ ] 定义 Finding -> RiskItem 映射规则
-- [ ] 实现综合评分公式：RiskScore = Impact * Likelihood * Confidence * ExposureWeight
-- [ ] 实现风险分级（Critical/High/Medium/Low）
-- [ ] 为每类漏洞补充修复建议模板
-- [ ] 增加复测建议字段（如何验证修复）
+- [x] 定义 Finding -> RiskItem 映射规则
+- [x] 实现综合评分公式：RiskScore = Impact * Likelihood * Confidence * ExposureWeight
+- [x] 实现风险分级（Critical/High/Medium/Low）
+- [x] 为每类漏洞补充修复建议模板
+- [x] 增加复测建议字段（如何验证修复）
 
 交付标准：
-- [ ] 风险项可按分数排序输出
-- [ ] 同一 Finding 重复执行分级结果稳定
+- [x] 风险项可按分数排序输出
+- [x] 同一 Finding 重复执行分级结果稳定
 
 ### 3.2 报告输出
 
