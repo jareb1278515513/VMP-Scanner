@@ -137,30 +137,30 @@
 
 ### 4.1 可视化报告数据契约
 
-- [ ] 定义前端报告输入模型（Summary、Asset、Finding、RiskItem、Recommendation）
+- [x] 定义前端报告输入模型（Summary、Asset、Finding、RiskItem、Recommendation）
 - [ ] 补充字段映射表（Detection/Assessment -> Presentation）
-- [ ] 统一时间、风险等级、URL 与证据字段格式
-- [ ] 设计版本字段与向后兼容策略（report_version）
+- [x] 统一时间、风险等级、URL 与证据字段格式
+- [x] 设计版本字段与向后兼容策略（report_version）
 
 交付标准：
-- [ ] 前端可用单一 JSON 输入完成页面渲染
+- [x] 前端可用单一 JSON 输入完成页面渲染
 - [ ] 数据契约文档可独立指导第三方接入
 
 ### 4.2 Web 报告页面基础实现
 
-- [ ] 实现独立 Web 报告页面（静态 HTML + CSS + JS）
-- [ ] 完成首页概览卡片（资产数、漏洞数、高危数、扫描耗时）
-- [ ] 完成漏洞列表表格（分页、排序、关键字段展示）
-- [ ] 完成漏洞详情抽屉/弹窗（evidence、复现步骤、修复建议、复测建议）
+- [x] 实现独立 Web 报告页面（静态 HTML + CSS + JS）
+- [x] 完成首页概览卡片（资产数、漏洞数、高危数、扫描耗时）
+- [x] 完成漏洞列表表格（分页、排序、关键字段展示）
+- [x] 完成漏洞详情抽屉/弹窗（evidence、复现步骤、修复建议、复测建议）
 
 交付标准：
-- [ ] 报告页面在本地浏览器可直接打开，无需额外服务
-- [ ] 主流程可通过参数输出 web 报告文件（如 reports/report.html）
+- [x] 报告页面在本地浏览器可直接打开，无需额外服务
+- [x] 主流程可通过参数输出 web 报告文件（如 reports/report.html）
 
 ### 4.3 交互与筛选能力
 
 - [ ] 实现多维筛选（风险等级、插件类型、目标资产、状态码区间）
-- [ ] 实现全文搜索（URL、参数名、漏洞标题、插件名）
+- [x] 实现全文搜索（URL、参数名、漏洞标题、插件名）
 - [ ] 实现视图联动（点击概览卡片可联动筛选结果）
 - [ ] 增加批量展开/折叠与快速定位（回到顶部、锚点跳转）
 
@@ -170,10 +170,10 @@
 
 ### 4.4 可视化与美观性增强
 
-- [ ] 增加风险分布图（等级分布、插件分布、资产分布）
+- [x] 增加风险分布图（等级分布、插件分布、资产分布）
 - [ ] 增加时间维度图（扫描阶段耗时或任务时间线）
-- [ ] 建立统一设计 token（颜色、字体、间距、圆角、阴影）
-- [ ] 适配响应式布局（桌面/平板/移动）
+- [x] 建立统一设计 token（颜色、字体、间距、圆角、阴影）
+- [x] 适配响应式布局（桌面/平板/移动）
 
 交付标准：
 - [ ] 页面在主流桌面分辨率与移动端可正常查看
@@ -181,7 +181,7 @@
 
 ### 4.5 导出与分享
 
-- [ ] 支持在页面内导出筛选后的 JSON 子集
+- [x] 支持在页面内导出筛选后的 JSON 子集
 - [ ] 支持打印友好样式（PDF 导出友好）
 - [ ] 支持生成离线归档包（HTML + 资源 + 原始 JSON）
 - [ ] 增加脱敏选项（隐藏账号、Cookie、敏感参数）
@@ -191,8 +191,8 @@
 - [ ] 离线环境可完整查看报告且不丢样式
 
 测试记录：
-- [ ] `uv run --with pytest pytest -q`（新增 presentation 层单元测试）-> 待补充
-- [ ] `uv run main.py --target http://127.0.0.1/dvwa/ --mode detect --report-json reports/dvwa.json --report-html reports/dvwa.html` -> 待补充
+- [x] `uv run --with pytest pytest -q`（新增 presentation 层单元测试）-> 31 passed
+- [x] `uv run main.py --target "http://127.0.0.1/dvwa/vulnerabilities/sqli/?id=1&Submit=Submit" --mode attack --max-depth 1 --allowed-domain 127.0.0.1 --auto-login --auth-login-url /dvwa/login.php --auth-username admin --auth-password password --auth-submit-field Login --auth-submit-value Login --auth-success-keyword logout.php --auth-extra security=low --report-json reports/dvwa-rich-risk.json --report-markdown reports/dvwa-rich-risk.md --report-html reports/dvwa-rich-risk.html --log-level INFO` -> 生成 JSON/Markdown/HTML 报告
 
 
 ## M5：稳定性与工程化（优先级 P1）

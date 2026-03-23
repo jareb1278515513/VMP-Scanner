@@ -87,6 +87,7 @@ def test_load_runtime_config_normalizes_detect_mode_alias() -> None:
         crawler_output_json=None,
         report_json=None,
         report_markdown=None,
+        report_html=None,
         grab_banner=False,
     )
 

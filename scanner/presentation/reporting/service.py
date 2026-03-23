@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import json
 from collections import Counter
 from datetime import datetime, timezone
@@ -16,25 +17,22 @@ class PresentationService:
         output = request.get("output") or {}
         metadata = request.get("metadata") or {}
 
-        report = self._build_report(
-            collection_bundle=collection_bundle,
-            finding_bundle=finding_bundle,
-            risk_bundle=risk_bundle,
-            metadata=metadata,
-        )
+        report = self._build_report(collection_bundle, finding_bundle, risk_bundle, metadata)
 
         result: dict[str, str] = {}
         json_path = output.get("json_path")
         markdown_path = output.get("markdown_path")
+        html_path = output.get("html_path")
 
         if json_path:
             path = _write_text(json_path, json.dumps(report, ensure_ascii=False, indent=2))
             result["json_path"] = str(path)
-
         if markdown_path:
-            markdown = self._render_markdown(report)
-            path = _write_text(markdown_path, markdown)
+            path = _write_text(markdown_path, self._render_markdown(report))
             result["markdown_path"] = str(path)
+        if html_path:
+            path = _write_text(html_path, self._render_html(report))
+            result["html_path"] = str(path)
 
         return result
 
@@ -48,30 +46,22 @@ class PresentationService:
         findings = list(finding_bundle.get("findings") or [])
         risks = list(risk_bundle.get("risk_items") or [])
 
-        severity_counter = Counter(
-            str(item.get("severity_hint", "unknown")).strip().lower() for item in findings
-        )
+        severity_counter = Counter(str(item.get("severity_hint", "unknown")).strip().lower() for item in findings)
         category_counter = Counter(str(item.get("category", "unknown")).strip().lower() for item in findings)
-
         recommendation_counter = Counter(
-            (
-                str(item.get("category", "unknown")),
-                str(item.get("recommendation", "")),
-                str(item.get("retest", "")),
-            )
+            (str(item.get("category", "unknown")), str(item.get("recommendation", "")), str(item.get("retest", "")))
             for item in risks
         )
 
-        recommendations = []
-        for (category, recommendation, retest), count in recommendation_counter.items():
-            recommendations.append(
-                {
-                    "category": category,
-                    "recommendation": recommendation,
-                    "retest": retest,
-                    "count": count,
-                }
-            )
+        recommendations = [
+            {
+                "category": category,
+                "recommendation": recommendation,
+                "retest": retest,
+                "count": count,
+            }
+            for (category, recommendation, retest), count in recommendation_counter.items()
+        ]
         recommendations.sort(key=lambda item: item["count"], reverse=True)
 
         web_assets = collection_bundle.get("web_assets") or {}
@@ -104,8 +94,7 @@ class PresentationService:
                 "findings": findings,
             },
             "risks": {
-                "summary": risk_bundle.get("summary")
-                or {"critical": 0, "high": 0, "medium": 0, "low": 0},
+                "summary": risk_bundle.get("summary") or {"critical": 0, "high": 0, "medium": 0, "low": 0},
                 "items": risks,
             },
             "recommendations": recommendations,
@@ -117,41 +106,35 @@ class PresentationService:
         }
 
     def _render_markdown(self, report: dict) -> str:
-        lines: list[str] = []
+        summary = (report.get("risks") or {}).get("summary") or {}
+        network_summary = (report.get("assets") or {}).get("network_summary") or {}
+        web_summary = (report.get("assets") or {}).get("web_summary") or {}
 
+        lines: list[str] = []
         lines.append("# VMP-Scanner Risk Report")
         lines.append("")
         lines.append("## 1. Basic Information")
         lines.append("")
         lines.append(f"- Target: {report.get('target', '-')}")
         lines.append(f"- Generated At (UTC): {report.get('generated_at', '-')}")
-
         metadata = report.get("metadata") or {}
         lines.append(f"- Mode: {metadata.get('mode', '-')}")
         lines.append(f"- Tool Version: {metadata.get('tool_version', '-')}")
         lines.append("")
-
         lines.append("## 2. Asset Summary")
         lines.append("")
-        network_summary = (report.get("assets") or {}).get("network_summary") or {}
-        web_summary = (report.get("assets") or {}).get("web_summary") or {}
         lines.append(f"- Network Ports: {network_summary.get('total_ports', 0)}")
         lines.append(f"- Open Ports: {network_summary.get('open_ports', 0)}")
         lines.append(f"- Visited Pages: {web_summary.get('visited_count', 0)}")
         lines.append(f"- URLs: {web_summary.get('urls', 0)}")
         lines.append(f"- Forms: {web_summary.get('forms', 0)}")
         lines.append("")
-
         lines.append("## 3. Risk Summary")
         lines.append("")
-        summary = (report.get("risks") or {}).get("summary") or {}
         lines.append("| Critical | High | Medium | Low |")
         lines.append("| --- | --- | --- | --- |")
-        lines.append(
-            f"| {summary.get('critical', 0)} | {summary.get('high', 0)} | {summary.get('medium', 0)} | {summary.get('low', 0)} |"
-        )
+        lines.append(f"| {summary.get('critical', 0)} | {summary.get('high', 0)} | {summary.get('medium', 0)} | {summary.get('low', 0)} |")
         lines.append("")
-
         lines.append("## 4. Top Risks")
         lines.append("")
         lines.append("| Finding ID | Category | Level | Score | Title |")
@@ -163,7 +146,6 @@ class PresentationService:
                 + " |"
             )
         lines.append("")
-
         lines.append("## 5. Recommendations")
         lines.append("")
         for idx, item in enumerate(report.get("recommendations") or [], start=1):
@@ -172,7 +154,6 @@ class PresentationService:
             lines.append(f"- Retest: {item.get('retest', '-')}")
             lines.append(f"- Related Findings: {item.get('count', 0)}")
             lines.append("")
-
         lines.append("## 6. Errors")
         lines.append("")
         errors = report.get("errors") or {}
@@ -180,8 +161,293 @@ class PresentationService:
         lines.append(f"- Detection: {len(errors.get('detection', []))}")
         lines.append(f"- Assessment: {len(errors.get('assessment', []))}")
         lines.append("")
-
         return "\n".join(lines)
+
+    def _render_html(self, report: dict) -> str:
+        target = html.escape(str(report.get("target", "-")))
+        generated_at = html.escape(str(report.get("generated_at", "-")))
+        metadata = report.get("metadata") or {}
+        mode = html.escape(str(metadata.get("mode", "-")))
+        tool_version = html.escape(str(metadata.get("tool_version", "-")))
+        summary = (report.get("risks") or {}).get("summary") or {}
+        risks = (report.get("risks") or {}).get("items") or []
+        vulnerabilities = report.get("vulnerabilities") or {}
+        assets = report.get("assets") or {}
+        network_summary = assets.get("network_summary") or {}
+        web_summary = assets.get("web_summary") or {}
+
+        return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VMP Report</title>
+  <style>
+    :root {{
+      --bg: #f5f5f7;
+      --card: rgba(255,255,255,0.78);
+      --ink: #111113;
+      --muted: #6e6e73;
+      --line: rgba(10,10,10,.08);
+      --critical: #c81e1e;
+      --high: #e46f2a;
+      --medium: #c99700;
+      --low: #2f8f4e;
+      --accent: #0071e3;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{
+      margin: 0;
+      color: var(--ink);
+      font-family: "SF Pro Display", "SF Pro Text", "Avenir Next", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 0 0, rgba(0,113,227,.15), transparent 38%), var(--bg);
+    }}
+    .wrap {{ max-width: 1240px; margin: 0 auto; padding: 28px 18px 40px; }}
+    .hero {{
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(246,246,248,.86));
+      box-shadow: 0 16px 46px rgba(0,0,0,.08);
+      padding: 24px;
+    }}
+    h1 {{ margin: 0; font-size: clamp(30px, 3.8vw, 44px); }}
+    .sub {{ margin-top: 8px; color: var(--muted); }}
+    .chips {{ margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }}
+    .chip {{ border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: 12px; background: #fff; }}
+    .metrics {{ margin-top: 14px; display: grid; gap: 10px; grid-template-columns: repeat(6, minmax(0,1fr)); }}
+    .metric {{ border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 12px; }}
+    .metric .k {{ font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }}
+    .metric .v {{ margin-top: 4px; font-size: 26px; font-weight: 640; }}
+    .controls {{ margin-top: 14px; display: grid; gap: 10px; grid-template-columns: 1.2fr repeat(3, minmax(0,1fr)); }}
+    .input, .select {{ width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 11px 12px; }}
+    .grid {{ margin-top: 14px; display: grid; gap: 12px; grid-template-columns: 1.35fr .95fr; }}
+    .panel {{ border: 1px solid var(--line); border-radius: 20px; background: var(--card); box-shadow: 0 10px 30px rgba(0,0,0,.06); overflow: hidden; }}
+    .panel-head {{ padding: 14px 16px; border-bottom: 1px solid var(--line); font-weight: 600; display: flex; justify-content: space-between; }}
+    .table-wrap {{ max-height: 560px; overflow: auto; }}
+    table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
+    th, td {{ text-align: left; padding: 12px 12px; border-bottom: 1px solid rgba(10,10,10,.06); }}
+    thead th {{ position: sticky; top: 0; background: #fafafc; z-index: 1; color: #56565b; }}
+    tbody tr {{ cursor: pointer; }}
+    tbody tr:hover {{ background: rgba(0,113,227,.06); }}
+    .badge {{ border-radius: 999px; padding: 5px 9px; font-size: 11px; color: #fff; text-transform: uppercase; font-weight: 700; }}
+    .critical {{ background: var(--critical); }}
+    .high {{ background: var(--high); }}
+    .medium {{ background: var(--medium); }}
+    .low {{ background: var(--low); }}
+    .plot {{ padding: 16px; }}
+    .ring {{ width: min(280px, 72%); aspect-ratio: 1; margin: 0 auto; border-radius: 50%; position: relative; }}
+    .ring::after {{ content: ""; position: absolute; inset: 20%; background: #fff; border-radius: 50%; box-shadow: 0 0 0 1px var(--line); }}
+    .ring-t {{ position: absolute; inset: 0; display: grid; place-items: center; z-index: 2; text-align: center; font-size: 12px; color: var(--muted); }}
+    .ring-t strong {{ display: block; color: var(--ink); font-size: 28px; }}
+    .legend {{ margin-top: 14px; display: grid; gap: 7px; }}
+    .legend div {{ display: flex; justify-content: space-between; }}
+    .dot {{ width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }}
+    .btn {{ margin-top: 14px; width: 100%; border: none; border-radius: 10px; background: var(--accent); color: #fff; padding: 10px; cursor: pointer; }}
+    .drawer {{ position: fixed; right: -560px; top: 0; width: min(560px, 92vw); height: 100vh; background: rgba(255,255,255,.96); border-left: 1px solid var(--line); transition: right .22s; padding: 16px; overflow: auto; z-index: 30; }}
+    .drawer.open {{ right: 0; }}
+    .kv {{ border: 1px solid var(--line); border-radius: 10px; background: #fafafc; white-space: pre-wrap; word-break: break-word; padding: 10px; font-size: 12px; max-height: 220px; overflow: auto; }}
+    @media (max-width: 1040px) {{ .metrics {{ grid-template-columns: repeat(3, minmax(0,1fr)); }} .controls {{ grid-template-columns: 1fr 1fr; }} .grid {{ grid-template-columns: 1fr; }} }}
+    @media (max-width: 640px) {{ .metrics {{ grid-template-columns: repeat(2, minmax(0,1fr)); }} .controls {{ grid-template-columns: 1fr; }} }}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Security Risk Intelligence</h1>
+      <div class="sub">Target: {target}</div>
+      <div class="chips">
+        <span class="chip">Generated: {generated_at}</span>
+        <span class="chip">Mode: {mode}</span>
+        <span class="chip">Version: {tool_version}</span>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="k">Findings</div><div class="v" id="metric-findings">{int(vulnerabilities.get('total', 0))}</div></div>
+        <div class="metric"><div class="k">Risks</div><div class="v" id="metric-risks">{len(risks)}</div></div>
+        <div class="metric"><div class="k">Critical</div><div class="v">{int(summary.get('critical', 0))}</div></div>
+        <div class="metric"><div class="k">High</div><div class="v">{int(summary.get('high', 0))}</div></div>
+        <div class="metric"><div class="k">Open Ports</div><div class="v">{int(network_summary.get('open_ports', 0))}</div></div>
+        <div class="metric"><div class="k">URLs</div><div class="v">{int(web_summary.get('urls', 0))}</div></div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <input id="searchInput" class="input" placeholder="Search title/category/plugin/url" />
+      <select id="levelSelect" class="select"><option value="">All Levels</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
+      <select id="categorySelect" class="select"><option value="">All Categories</option></select>
+      <select id="pluginSelect" class="select"><option value="">All Plugins</option></select>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <div class="panel-head"><span>Risk Items</span><span id="rowCounter">0 items</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Level</th><th>Score</th><th>Category</th><th>Plugin</th><th>Title</th><th>URL</th></tr></thead>
+            <tbody id="riskBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="panel">
+        <div class="panel-head">Risk Distribution</div>
+        <div class="plot">
+          <div class="ring" id="ring"><div class="ring-t"><div><strong id="ringTotal">0</strong>Total Risks</div></div></div>
+          <div class="legend" id="legend"></div>
+          <button class="btn" id="exportBtn">Export Filtered JSON</button>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+  <aside id="drawer" class="drawer">
+    <button id="closeDrawer">Close</button>
+    <h2 id="detailTitle">Risk Detail</h2>
+    <p id="detailMeta"></p>
+    <h4>Recommendation</h4>
+    <div id="detailRecommendation" class="kv"></div>
+    <h4>Retest</h4>
+    <div id="detailRetest" class="kv"></div>
+    <h4>Evidence</h4>
+    <div id="detailEvidence" class="kv"></div>
+  </aside>
+
+  <script id="report-data" type="application/json">{_safe_json_for_html(report)}</script>
+  <script>
+    const report = JSON.parse(document.getElementById('report-data').textContent);
+    const allItems = Array.isArray(report?.risks?.items) ? report.risks.items : [];
+
+    const riskBody = document.getElementById('riskBody');
+    const rowCounter = document.getElementById('rowCounter');
+    const metricFindings = document.getElementById('metric-findings');
+    const metricRisks = document.getElementById('metric-risks');
+    const ring = document.getElementById('ring');
+    const ringTotal = document.getElementById('ringTotal');
+    const legend = document.getElementById('legend');
+    const drawer = document.getElementById('drawer');
+
+    const searchInput = document.getElementById('searchInput');
+    const levelSelect = document.getElementById('levelSelect');
+    const categorySelect = document.getElementById('categorySelect');
+    const pluginSelect = document.getElementById('pluginSelect');
+
+    function uniqueValues(key) {{
+      return [...new Set(allItems.map(item => String(item?.[key] || '').trim()).filter(Boolean))].sort();
+    }}
+
+    function fillSelect(select, values) {{
+      for (const value of values) {{
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      }}
+    }}
+
+    fillSelect(categorySelect, uniqueValues('category'));
+    fillSelect(pluginSelect, uniqueValues('plugin'));
+
+    function normalizedLevel(level) {{
+      return String(level || 'low').toLowerCase();
+    }}
+
+    function itemText(item) {{
+      const url = String(item?.location?.url || '');
+      return [item?.title, item?.category, item?.plugin, url].join(' ').toLowerCase();
+    }}
+
+    function getFilteredItems() {{
+      const keyword = searchInput.value.trim().toLowerCase();
+      const level = levelSelect.value;
+      const category = categorySelect.value;
+      const plugin = pluginSelect.value;
+
+      return allItems
+        .filter(item => !keyword || itemText(item).includes(keyword))
+        .filter(item => !level || item.level === level)
+        .filter(item => !category || item.category === category)
+        .filter(item => !plugin || item.plugin === plugin)
+        .sort((a, b) => Number(b.score || 0) - Number(a.score || 0));
+    }}
+
+    function showDetail(item) {{
+      document.getElementById('detailTitle').textContent = item?.title || 'Risk Detail';
+      document.getElementById('detailMeta').textContent = `${{item?.level || '-'}} · ${{item?.category || '-'}} · score=${{Number(item?.score || 0).toFixed(2)}}`;
+      document.getElementById('detailRecommendation').textContent = item?.recommendation || '-';
+      document.getElementById('detailRetest').textContent = item?.retest || '-';
+      document.getElementById('detailEvidence').textContent = JSON.stringify(item?.evidence || {{}}, null, 2);
+      drawer.classList.add('open');
+    }}
+
+    function renderTable(items) {{
+      riskBody.innerHTML = '';
+      for (const item of items) {{
+        const row = document.createElement('tr');
+        const url = String(item?.location?.url || '-');
+        row.innerHTML = `
+          <td><span class="badge ${{normalizedLevel(item.level)}}">${{item.level || 'Low'}}</span></td>
+          <td>${{Number(item.score || 0).toFixed(2)}}</td>
+          <td>${{item.category || '-'}}</td>
+          <td>${{item.plugin || '-'}}</td>
+          <td>${{item.title || '-'}}</td>
+          <td title="${{url}}">${{url.length > 54 ? url.slice(0, 51) + '...' : url}}</td>
+        `;
+        row.addEventListener('click', () => showDetail(item));
+        riskBody.appendChild(row);
+      }}
+      rowCounter.textContent = `${{items.length}} items`;
+      metricFindings.textContent = String(items.length);
+      metricRisks.textContent = String(items.length);
+    }}
+
+    function renderRing(items) {{
+      const counts = {{ Critical: 0, High: 0, Medium: 0, Low: 0 }};
+      for (const item of items) {{
+        const level = String(item?.level || 'Low');
+        if (counts[level] !== undefined) counts[level] += 1;
+      }}
+      const total = items.length || 1;
+      const c = counts.Critical / total * 360;
+      const h = c + counts.High / total * 360;
+      const m = h + counts.Medium / total * 360;
+
+      ring.style.background = `conic-gradient(var(--critical) 0deg ${{c}}deg, var(--high) ${{c}}deg ${{h}}deg, var(--medium) ${{h}}deg ${{m}}deg, var(--low) ${{m}}deg 360deg)`;
+      ringTotal.textContent = String(items.length);
+      legend.innerHTML = `
+        <div><span><span class="dot" style="background:var(--critical)"></span>Critical</span><strong>${{counts.Critical}}</strong></div>
+        <div><span><span class="dot" style="background:var(--high)"></span>High</span><strong>${{counts.High}}</strong></div>
+        <div><span><span class="dot" style="background:var(--medium)"></span>Medium</span><strong>${{counts.Medium}}</strong></div>
+        <div><span><span class="dot" style="background:var(--low)"></span>Low</span><strong>${{counts.Low}}</strong></div>
+      `;
+    }}
+
+    function renderAll() {{
+      const items = getFilteredItems();
+      renderTable(items);
+      renderRing(items);
+    }}
+
+    [searchInput, levelSelect, categorySelect, pluginSelect].forEach(el => {{
+      el.addEventListener('input', renderAll);
+      el.addEventListener('change', renderAll);
+    }});
+
+    document.getElementById('closeDrawer').addEventListener('click', () => drawer.classList.remove('open'));
+
+    document.getElementById('exportBtn').addEventListener('click', () => {{
+      const items = getFilteredItems();
+      const blob = new Blob([JSON.stringify(items, null, 2)], {{ type: 'application/json' }});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'filtered-risk-items.json';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }});
+
+    renderAll();
+  </script>
+</body>
+</html>
+"""
 
 
 def _utc_now_iso() -> str:
@@ -193,3 +459,7 @@ def _write_text(path_like: str, content: str) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
     return path
+
+
+def _safe_json_for_html(value: object) -> str:
+    return json.dumps(value, ensure_ascii=False).replace("</", "<\\/")

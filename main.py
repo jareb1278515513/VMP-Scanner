@@ -51,6 +51,7 @@ class DefaultConfig:
     crawler_output_json: str | None = None
     report_json: str | None = None
     report_markdown: str | None = None
+    report_html: str | None = None
     grab_banner: bool = False
 
 
@@ -203,6 +204,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="Write full risk report Markdown to this path",
     )
     parser.add_argument(
+        "--report-html",
+        help="Write interactive web risk report HTML to this path",
+    )
+    parser.add_argument(
         "--grab-banner",
         action="store_true",
         help="Attempt to read lightweight service banners from open ports",
@@ -288,6 +293,8 @@ def load_runtime_config(args: argparse.Namespace) -> dict:
         config["report_json"] = args.report_json
     if getattr(args, "report_markdown", None) is not None:
         config["report_markdown"] = args.report_markdown
+    if getattr(args, "report_html", None) is not None:
+        config["report_html"] = args.report_html
     if args.grab_banner:
         config["grab_banner"] = True
 
@@ -554,7 +561,11 @@ def main() -> int:
             logging.warning("Assessment layer warnings: %s", risk_bundle["errors"])
         logging.debug("Risk bundle: %s", json.dumps(risk_bundle, ensure_ascii=False))
 
-        if runtime_config.get("report_json") or runtime_config.get("report_markdown"):
+        if (
+            runtime_config.get("report_json")
+            or runtime_config.get("report_markdown")
+            or runtime_config.get("report_html")
+        ):
             presentation_service = PresentationService()
             render_result = presentation_service.render(
                 {
@@ -564,6 +575,7 @@ def main() -> int:
                     "output": {
                         "json_path": runtime_config.get("report_json"),
                         "markdown_path": runtime_config.get("report_markdown"),
+                        "html_path": runtime_config.get("report_html"),
                     },
                     "metadata": {
                         "mode": runtime_config["mode"],
@@ -576,6 +588,8 @@ def main() -> int:
                 logging.info("Risk JSON report written to: %s", render_result["json_path"])
             if render_result.get("markdown_path"):
                 logging.info("Risk Markdown report written to: %s", render_result["markdown_path"])
+            if render_result.get("html_path"):
+                logging.info("Risk HTML report written to: %s", render_result["html_path"])
 
         return 0
     except Exception as exc:
