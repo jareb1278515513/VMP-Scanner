@@ -4,15 +4,8 @@ import logging
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from urllib.parse import urlparse
 
-from scanner.collection.crawler import (
-    build_form_login_session,
-    crawl_web_state,
-    parse_cookie_header,
-    parse_key_value_pairs,
-)
-from scanner.collection.network.scanner import normalize_target_host, parse_ports, scan_host_ports
+from scanner.collection import CollectionService
 
 
 @dataclass(frozen=True)
@@ -207,22 +200,52 @@ def main() -> int:
         runtime_config = load_runtime_config(args)
         logging.info("Runtime config: %s", json.dumps(runtime_config, ensure_ascii=False))
 
-        target_host = normalize_target_host(runtime_config["target"])
-        port_list = parse_ports(runtime_config.get("ports"), runtime_config.get("port_range"))
-        scan_results = scan_host_ports(
-            host=target_host,
-            ports=port_list,
-            timeout=runtime_config["timeout"],
-            concurrency=runtime_config["concurrency"],
-            grab_banner=runtime_config["grab_banner"],
+        collection_service = CollectionService()
+        collection_bundle = collection_service.collect(
+            {
+                "target": runtime_config["target"],
+                "mode": runtime_config["mode"],
+                "timeout": runtime_config["timeout"],
+                "concurrency": runtime_config["concurrency"],
+                "network": {
+                    "ports": runtime_config.get("ports"),
+                    "port_range": runtime_config.get("port_range"),
+                    "grab_banner": runtime_config["grab_banner"],
+                },
+                "crawler": {
+                    "enabled": True,
+                    "max_depth": runtime_config["max_depth"],
+                    "allowed_domains": runtime_config.get("allowed_domains"),
+                    "cookie_header": runtime_config.get("cookie"),
+                    "auth": {
+                        "enabled": runtime_config.get("auto_login", False),
+                        "login_url": runtime_config.get("auth_login_url"),
+                        "username": runtime_config.get("auth_username"),
+                        "password": runtime_config.get("auth_password"),
+                        "username_field": runtime_config.get("auth_username_field"),
+                        "password_field": runtime_config.get("auth_password_field"),
+                        "csrf_field": runtime_config.get("auth_csrf_field"),
+                        "submit_field": runtime_config.get("auth_submit_field"),
+                        "submit_value": runtime_config.get("auth_submit_value"),
+                        "success_keyword": runtime_config.get("auth_success_keyword"),
+                        "extra_fields": runtime_config.get("auth_extra"),
+                    },
+                },
+                "metadata": {
+                    "tool": "vmp-scanner",
+                    "entrypoint": "main.py",
+                },
+            }
         )
+
+        scan_results = collection_bundle.get("network_assets", [])
 
         open_ports = [item for item in scan_results if item["status"] == "open"]
         logging.info(
             "Network scan completed: total=%d, open=%d, target=%s",
             len(scan_results),
             len(open_ports),
-            target_host,
+            runtime_config["target"],
         )
         if open_ports:
             open_port_text = ", ".join(
@@ -237,34 +260,8 @@ def main() -> int:
             logging.info("Open ports: none")
         logging.debug("Network scan results: %s", json.dumps(scan_results, ensure_ascii=False))
 
-        parsed_target = urlparse(runtime_config["target"])
-        if parsed_target.scheme in ("http", "https"):
-            crawl_session = None
-            if runtime_config.get("auto_login"):
-                crawl_session = build_form_login_session(
-                    base_url=runtime_config["target"],
-                    login_url=runtime_config.get("auth_login_url"),
-                    username=runtime_config["auth_username"],
-                    password=runtime_config["auth_password"],
-                    timeout=runtime_config["timeout"],
-                    username_field=runtime_config["auth_username_field"],
-                    password_field=runtime_config["auth_password_field"],
-                    csrf_field=runtime_config["auth_csrf_field"],
-                    submit_field=runtime_config.get("auth_submit_field"),
-                    submit_value=runtime_config.get("auth_submit_value"),
-                    success_keyword=runtime_config.get("auth_success_keyword"),
-                    extra_form_fields=parse_key_value_pairs(runtime_config.get("auth_extra")),
-                )
-                logging.info("Auto-login completed")
-
-            crawl_report = crawl_web_state(
-                start_url=runtime_config["target"],
-                max_depth=runtime_config["max_depth"],
-                timeout=runtime_config["timeout"],
-                allowed_domains=runtime_config.get("allowed_domains"),
-                cookies=parse_cookie_header(runtime_config.get("cookie")),
-                session=crawl_session,
-            )
+        crawl_report = collection_bundle.get("web_assets")
+        if crawl_report is not None:
             logging.info(
                 "Crawler completed: visited=%d, urls=%d, forms=%d, suspicious=%d",
                 crawl_report["visited_count"],
@@ -282,6 +279,10 @@ def main() -> int:
                     encoding="utf-8",
                 )
                 logging.info("Crawler report written to: %s", output_path)
+
+        if collection_bundle.get("errors"):
+            logging.warning("Collection layer warnings: %s", collection_bundle["errors"])
+        logging.debug("Collection bundle: %s", json.dumps(collection_bundle, ensure_ascii=False))
 
         return 0
     except Exception as exc:
