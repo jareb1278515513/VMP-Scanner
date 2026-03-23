@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from scanner.collection import CollectionService
+from scanner.detection import DetectionExecutor
 
 
 @dataclass(frozen=True)
@@ -283,6 +284,23 @@ def main() -> int:
         if collection_bundle.get("errors"):
             logging.warning("Collection layer warnings: %s", collection_bundle["errors"])
         logging.debug("Collection bundle: %s", json.dumps(collection_bundle, ensure_ascii=False))
+
+        detection_executor = DetectionExecutor()
+        finding_bundle = detection_executor.run(
+            collection_bundle=collection_bundle,
+            mode=runtime_config["mode"],
+        )
+        logging.info(
+            "Detection completed: findings=%d, plugins(total=%d, success=%d, failed=%d, skipped=%d)",
+            len(finding_bundle["findings"]),
+            finding_bundle["plugin_stats"]["total"],
+            finding_bundle["plugin_stats"]["success"],
+            finding_bundle["plugin_stats"]["failed"],
+            finding_bundle["plugin_stats"]["skipped"],
+        )
+        if finding_bundle.get("errors"):
+            logging.warning("Detection layer warnings: %s", finding_bundle["errors"])
+        logging.debug("Finding bundle: %s", json.dumps(finding_bundle, ensure_ascii=False))
 
         return 0
     except Exception as exc:
