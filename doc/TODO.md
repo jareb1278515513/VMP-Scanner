@@ -7,7 +7,7 @@
 
 ## 里程碑总览
 
-- [ ] M1 采集层可用（网络探测 + Web 爬虫）
+- [x] M1 采集层可用（网络探测 + Web 爬虫）
 - [ ] M2 漏洞探测层可用（插件框架 + 3~5 个插件）
 - [ ] M3 风险评估与报告闭环（评分 + 输出）
 - [ ] M4 稳定性与工程化完善（测试、日志、文档）
@@ -41,15 +41,21 @@
 
 ### 1.3 Web 状态感知爬虫引擎（Web Crawler Engine）
 
-- [ ] 基于 requests + BeautifulSoup 抓取页面
-- [ ] 提取链接、表单、输入字段
-- [ ] 实现 URL 去重和标准化
-- [ ] 支持最大深度限制与域名白名单
-- [ ] 支持会话 Cookie（用于 DVWA 登录态）
+- [x] 基于 requests + BeautifulSoup 抓取页面
+- [x] 提取链接、表单、输入字段
+- [x] 实现 URL 去重和标准化
+- [x] 支持最大深度限制与域名白名单
+- [x] 支持会话 Cookie（用于 DVWA 登录态）
 
 交付标准：
-- [ ] 能产出 URL 列表与表单列表
-- [ ] 输出字段包含来源页、方法、参数、深度
+- [x] 能产出 URL 列表与表单列表
+- [x] 输出字段包含来源页、方法、参数、深度
+
+测试记录：
+- `uv run --with pytest pytest -q` -> 3 passed
+- `uv run main.py --target http://localhost/ --max-depth 1 --allowed-domain localhost --timeout 1` -> 爬虫流程可执行并输出统计日志
+- `uv run --with pytest pytest -q`（新增 DVWA 自动登录测试）-> 4 passed
+- `uv run main.py --target http://127.0.0.1/dvwa/ --max-depth 2 --allowed-domain 127.0.0.1 --auto-login --auth-login-url /dvwa/login.php --auth-username admin --auth-password password --auth-submit-field Login --auth-submit-value Login --auth-success-keyword logout.php --auth-extra security=low --crawler-output-json reports/dvwa-crawl.json` -> 在 DVWA 服务已启动时支持通用自动登录与 JSON 输出
 
 ---
 
@@ -135,6 +141,7 @@
 
 ### 4.2 可维护性改进
 
+- [ ] 使用统一的参数配置文件,可以不在cli中输入过多参数
 - [ ] 统一日志格式与日志级别
 - [ ] 完善错误处理（超时、连接失败、解析失败）
 - [ ] 补充 README 运行说明与示例命令

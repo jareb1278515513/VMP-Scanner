@@ -3,7 +3,15 @@ import json
 import logging
 import time
 from dataclasses import asdict, dataclass
+from pathlib import Path
+from urllib.parse import urlparse
 
+from scanner.collection.crawler import (
+    build_form_login_session,
+    crawl_web_state,
+    parse_cookie_header,
+    parse_key_value_pairs,
+)
 from scanner.collection.network.scanner import normalize_target_host, parse_ports, scan_host_ports
 
 
@@ -16,6 +24,20 @@ class DefaultConfig:
     timeout: float = 1.0
     ports: str = "80,443,8080,3306"
     port_range: str | None = None
+    allowed_domains: list[str] | None = None
+    cookie: str | None = None
+    auto_login: bool = False
+    auth_login_url: str | None = None
+    auth_username: str = "admin"
+    auth_password: str = "password"
+    auth_username_field: str = "username"
+    auth_password_field: str = "password"
+    auth_csrf_field: str = "user_token"
+    auth_submit_field: str | None = None
+    auth_submit_value: str | None = None
+    auth_success_keyword: str | None = None
+    auth_extra: list[str] | None = None
+    crawler_output_json: str | None = None
     grab_banner: bool = False
 
 
@@ -35,6 +57,71 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--timeout", type=float, help="Network timeout in seconds")
     parser.add_argument("--ports", help="Comma-separated ports, for example 80,443,3306")
     parser.add_argument("--port-range", help="Port range, for example 1-1024")
+    parser.add_argument(
+        "--allowed-domain",
+        action="append",
+        dest="allowed_domains",
+        help="Allow crawling this domain (repeatable), defaults to target host",
+    )
+    parser.add_argument(
+        "--cookie",
+        help="Cookie header value for authenticated crawling, example: PHPSESSID=abc; security=low",
+    )
+    parser.add_argument(
+        "--auto-login",
+        action="store_true",
+        help="Auto login with a generic form before crawling",
+    )
+    parser.add_argument(
+        "--auth-login-url",
+        help="Login form URL (relative or absolute). Defaults to --target",
+    )
+    parser.add_argument(
+        "--auth-username",
+        default="admin",
+        help="Username for --auto-login",
+    )
+    parser.add_argument(
+        "--auth-password",
+        default="password",
+        help="Password for --auto-login",
+    )
+    parser.add_argument(
+        "--auth-username-field",
+        default="username",
+        help="Username field name in login form",
+    )
+    parser.add_argument(
+        "--auth-password-field",
+        default="password",
+        help="Password field name in login form",
+    )
+    parser.add_argument(
+        "--auth-csrf-field",
+        default="user_token",
+        help="CSRF hidden field name if present",
+    )
+    parser.add_argument(
+        "--auth-submit-field",
+        help="Submit button field name if required",
+    )
+    parser.add_argument(
+        "--auth-submit-value",
+        help="Submit button field value if required",
+    )
+    parser.add_argument(
+        "--auth-success-keyword",
+        help="Keyword to confirm login success in response HTML",
+    )
+    parser.add_argument(
+        "--auth-extra",
+        action="append",
+        help="Additional login form value in key=value format (repeatable)",
+    )
+    parser.add_argument(
+        "--crawler-output-json",
+        help="Write crawler report JSON to this path",
+    )
     parser.add_argument(
         "--grab-banner",
         action="store_true",
@@ -67,6 +154,34 @@ def load_runtime_config(args: argparse.Namespace) -> dict:
     if args.port_range is not None:
         config["port_range"] = args.port_range
         config["ports"] = None
+    if args.allowed_domains is not None:
+        config["allowed_domains"] = args.allowed_domains
+    if args.cookie is not None:
+        config["cookie"] = args.cookie
+    if args.auto_login:
+        config["auto_login"] = True
+    if args.auth_login_url is not None:
+        config["auth_login_url"] = args.auth_login_url
+    if args.auth_username is not None:
+        config["auth_username"] = args.auth_username
+    if args.auth_password is not None:
+        config["auth_password"] = args.auth_password
+    if args.auth_username_field is not None:
+        config["auth_username_field"] = args.auth_username_field
+    if args.auth_password_field is not None:
+        config["auth_password_field"] = args.auth_password_field
+    if args.auth_csrf_field is not None:
+        config["auth_csrf_field"] = args.auth_csrf_field
+    if args.auth_submit_field is not None:
+        config["auth_submit_field"] = args.auth_submit_field
+    if args.auth_submit_value is not None:
+        config["auth_submit_value"] = args.auth_submit_value
+    if args.auth_success_keyword is not None:
+        config["auth_success_keyword"] = args.auth_success_keyword
+    if args.auth_extra is not None:
+        config["auth_extra"] = args.auth_extra
+    if args.crawler_output_json is not None:
+        config["crawler_output_json"] = args.crawler_output_json
     if args.grab_banner:
         config["grab_banner"] = True
 
@@ -121,6 +236,53 @@ def main() -> int:
         else:
             logging.info("Open ports: none")
         logging.debug("Network scan results: %s", json.dumps(scan_results, ensure_ascii=False))
+
+        parsed_target = urlparse(runtime_config["target"])
+        if parsed_target.scheme in ("http", "https"):
+            crawl_session = None
+            if runtime_config.get("auto_login"):
+                crawl_session = build_form_login_session(
+                    base_url=runtime_config["target"],
+                    login_url=runtime_config.get("auth_login_url"),
+                    username=runtime_config["auth_username"],
+                    password=runtime_config["auth_password"],
+                    timeout=runtime_config["timeout"],
+                    username_field=runtime_config["auth_username_field"],
+                    password_field=runtime_config["auth_password_field"],
+                    csrf_field=runtime_config["auth_csrf_field"],
+                    submit_field=runtime_config.get("auth_submit_field"),
+                    submit_value=runtime_config.get("auth_submit_value"),
+                    success_keyword=runtime_config.get("auth_success_keyword"),
+                    extra_form_fields=parse_key_value_pairs(runtime_config.get("auth_extra")),
+                )
+                logging.info("Auto-login completed")
+
+            crawl_report = crawl_web_state(
+                start_url=runtime_config["target"],
+                max_depth=runtime_config["max_depth"],
+                timeout=runtime_config["timeout"],
+                allowed_domains=runtime_config.get("allowed_domains"),
+                cookies=parse_cookie_header(runtime_config.get("cookie")),
+                session=crawl_session,
+            )
+            logging.info(
+                "Crawler completed: visited=%d, urls=%d, forms=%d, suspicious=%d",
+                crawl_report["visited_count"],
+                len(crawl_report["urls"]),
+                len(crawl_report["forms"]),
+                len(crawl_report["suspicious_endpoints"]),
+            )
+            logging.debug("Crawler report: %s", json.dumps(crawl_report, ensure_ascii=False))
+
+            if runtime_config.get("crawler_output_json"):
+                output_path = Path(runtime_config["crawler_output_json"])
+                output_path.parent.mkdir(parents=True, exist_ok=True)
+                output_path.write_text(
+                    json.dumps(crawl_report, ensure_ascii=False, indent=2),
+                    encoding="utf-8",
+                )
+                logging.info("Crawler report written to: %s", output_path)
+
         return 0
     except Exception as exc:
         logging.exception("Task failed: %s", exc)
