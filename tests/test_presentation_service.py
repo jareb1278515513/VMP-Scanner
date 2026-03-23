@@ -119,3 +119,10 @@ def test_presentation_service_renders_json_and_markdown(tmp_path: Path) -> None:
     assert "安全风险总览" in html_doc
     assert "id=\"riskBody\"" in html_doc
     assert "筛选后的风险条目.json" in html_doc
+    assert "id=\"assetSelect\"" in html_doc
+    assert "id=\"statusMinInput\"" in html_doc
+    assert "id=\"statusMaxInput\"" in html_doc
+    assert "id=\"backToTopBtn\"" in html_doc
+    assert "id=\"expandAllRecsBtn\"" in html_doc
+    assert "id=\"collapseAllRecsBtn\"" in html_doc
+    assert "metric-card" in html_doc

@@ -302,6 +302,47 @@
 
 ---
 
+### 4.5 字段映射表（Detection/Assessment -> Presentation）
+
+以下映射基于当前实现：`scanner/presentation/reporting/service.py` 的 `_build_report` 逻辑。
+
+#### 4.5.1 Detection（FindingBundle）-> Presentation
+
+| Detection 字段 | Presentation 字段 | 转换规则 | 备注 |
+| --- | --- | --- | --- |
+| `target` | `target` | 当 `risks.target` 为空时，回退到 `findings.target` | `collection.target` 为最终回退 |
+| `findings` | `vulnerabilities.findings` | 原样透传 | 列表元素结构保持不变 |
+| `findings[].category` | `vulnerabilities.by_category` | 小写归一化后计数 | `Counter` 聚合 |
+| `findings[].severity_hint` | `vulnerabilities.by_severity_hint` | 小写归一化后计数 | `Counter` 聚合 |
+| `findings` | `vulnerabilities.total` | `len(findings)` | 统计字段 |
+| `errors` | `errors.detection` | 原样透传（缺失时空数组） | 错误隔离展示 |
+| `plugin_stats` | - | 当前不进入 Presentation Report 主结构 | 可作为后续扩展字段 |
+
+#### 4.5.2 Assessment（RiskBundle）-> Presentation
+
+| Assessment 字段 | Presentation 字段 | 转换规则 | 备注 |
+| --- | --- | --- | --- |
+| `target` | `target` | 优先级最高，直接覆盖报告目标 | 若为空则回退到 Detection/Collection |
+| `risk_items` | `risks.items` | 原样透传 | 列表元素结构保持不变 |
+| `summary` | `risks.summary` | 原样透传；为空时默认 `{critical:0,high:0,medium:0,low:0}` | 风险总览卡片来源 |
+| `risk_items[].category + recommendation + retest` | `recommendations[]` | 按三元组分组计数，生成 `{category,recommendation,retest,count}` | 按 `count` 降序排序 |
+| `errors` | `errors.assessment` | 原样透传（缺失时空数组） | 错误隔离展示 |
+
+#### 4.5.3 Presentation 派生与兜底规则
+
+| Presentation 字段 | 数据来源 | 规则 |
+| --- | --- | --- |
+| `schema_version` | `PresentationService.schema_version` | 当前固定为 `1.0` |
+| `generated_at` | 系统时间 | UTC ISO 8601 |
+| `metadata` | `PresentationRequest.metadata` | 原样透传（缺失时空对象） |
+| `errors.collection` | `CollectionBundle.errors` | 缺失时空数组 |
+| `errors.detection` | `FindingBundle.errors` | 缺失时空数组 |
+| `errors.assessment` | `RiskBundle.errors` | 缺失时空数组 |
+
+实现建议：第三方接入 Presentation 时，至少保证 `findings.findings` 与 `risks.risk_items/summary` 字段完整，以确保风险统计、详情展示、建议聚合可用。
+
+---
+
 ## 5. 通用字段规范
 
 ### 5.1 必填元数据

@@ -202,7 +202,7 @@ class PresentationService:
       font-family: "SF Pro Display", "SF Pro Text", "Avenir Next", "Segoe UI", sans-serif;
       background: radial-gradient(circle at 0 0, rgba(0,113,227,.15), transparent 38%), var(--bg);
     }}
-    .wrap {{ max-width: 1240px; margin: 0 auto; padding: 28px 18px 40px; }}
+    .wrap {{ width: min(96vw, 1680px); margin: 0 auto; padding: 28px 18px 40px; }}
     .hero {{
       border: 1px solid var(--line);
       border-radius: 22px;
@@ -214,12 +214,25 @@ class PresentationService:
     .sub {{ margin-top: 8px; color: var(--muted); }}
     .chips {{ margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }}
     .chip {{ border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: 12px; background: #fff; }}
-    .metrics {{ margin-top: 14px; display: grid; gap: 10px; grid-template-columns: repeat(6, minmax(0,1fr)); }}
+    .metrics {{ margin-top: 14px; display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0,1fr)); }}
     .metric {{ border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 12px; }}
+    .metric-card {{ cursor: pointer; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }}
+    .metric-card:hover {{ transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.08); }}
+    .metric-card.active {{ border-color: rgba(0,113,227,.6); box-shadow: 0 0 0 2px rgba(0,113,227,.14); }}
     .metric .k {{ font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }}
     .metric .v {{ margin-top: 4px; font-size: 26px; font-weight: 640; }}
-    .controls {{ margin-top: 14px; display: grid; gap: 10px; grid-template-columns: 1.2fr repeat(3, minmax(0,1fr)); }}
+    .quick-nav {{ margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }}
+    .quick-nav a, .quick-nav button {{ text-decoration: none; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 999px; padding: 7px 10px; font-size: 12px; cursor: pointer; }}
+    .controls {{
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-items: center;
+    }}
+    .control-search {{ grid-column: span 2; }}
     .input, .select {{ width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 11px 12px; }}
+    .num {{ width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 11px 12px; }}
     .grid {{ margin-top: 14px; display: grid; gap: 12px; grid-template-columns: 1.35fr .95fr; }}
     .panel {{ border: 1px solid var(--line); border-radius: 20px; background: var(--card); box-shadow: 0 10px 30px rgba(0,0,0,.06); overflow: hidden; }}
     .panel-head {{ padding: 14px 16px; border-bottom: 1px solid var(--line); font-weight: 600; display: flex; justify-content: space-between; }}
@@ -243,16 +256,23 @@ class PresentationService:
     .legend div {{ display: flex; justify-content: space-between; }}
     .dot {{ width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }}
     .btn {{ margin-top: 14px; width: 100%; border: none; border-radius: 10px; background: var(--accent); color: #fff; padding: 10px; cursor: pointer; }}
+    .stack-actions {{ display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px 0; }}
+    .stack-actions button {{ border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 10px; cursor: pointer; }}
+    .recommendation-list {{ padding: 12px 16px 16px; display: grid; gap: 10px; }}
+    .rec-item {{ border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }}
+    .rec-item > summary {{ cursor: pointer; list-style: none; padding: 10px 12px; display: flex; justify-content: space-between; gap: 8px; }}
+    .rec-item > summary::-webkit-details-marker {{ display: none; }}
+    .rec-body {{ border-top: 1px solid var(--line); padding: 10px 12px; color: #3a3a3c; font-size: 13px; }}
     .drawer {{ position: fixed; right: -560px; top: 0; width: min(560px, 92vw); height: 100vh; background: rgba(255,255,255,.96); border-left: 1px solid var(--line); transition: right .22s; padding: 16px; overflow: auto; z-index: 30; }}
     .drawer.open {{ right: 0; }}
     .kv {{ border: 1px solid var(--line); border-radius: 10px; background: #fafafc; white-space: pre-wrap; word-break: break-word; padding: 10px; font-size: 12px; max-height: 220px; overflow: auto; }}
-    @media (max-width: 1040px) {{ .metrics {{ grid-template-columns: repeat(3, minmax(0,1fr)); }} .controls {{ grid-template-columns: 1fr 1fr; }} .grid {{ grid-template-columns: 1fr; }} }}
-    @media (max-width: 640px) {{ .metrics {{ grid-template-columns: repeat(2, minmax(0,1fr)); }} .controls {{ grid-template-columns: 1fr; }} }}
+    @media (max-width: 1040px) {{ .metrics {{ grid-template-columns: repeat(2, minmax(0,1fr)); }} .controls {{ grid-template-columns: 1fr 1fr; }} .control-search {{ grid-column: span 2; }} .grid {{ grid-template-columns: 1fr; }} }}
+    @media (max-width: 640px) {{ .metrics {{ grid-template-columns: 1fr; }} .controls {{ grid-template-columns: 1fr; }} .control-search {{ grid-column: span 1; }} }}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <section class="hero">
+    <section class="hero" id="overview">
       <h1>安全风险总览 <span style="font-weight:500;color:#6e6e73;">Security Intelligence</span></h1>
       <div class="sub">目标 Target: {target}</div>
       <div class="chips">
@@ -261,34 +281,47 @@ class PresentationService:
         <span class="chip">版本 Version: {tool_version}</span>
       </div>
       <div class="metrics">
-        <div class="metric"><div class="k">发现 Findings</div><div class="v" id="metric-findings">{int(vulnerabilities.get('total', 0))}</div></div>
-        <div class="metric"><div class="k">风险 Risks</div><div class="v" id="metric-risks">{len(risks)}</div></div>
-        <div class="metric"><div class="k">Critical</div><div class="v">{int(summary.get('critical', 0))}</div></div>
-        <div class="metric"><div class="k">High</div><div class="v">{int(summary.get('high', 0))}</div></div>
+        <div class="metric metric-card" data-level=""><div class="k">发现 Findings</div><div class="v" id="metric-findings">{int(vulnerabilities.get('total', 0))}</div></div>
+        <div class="metric metric-card" data-level=""><div class="k">风险 Risks</div><div class="v" id="metric-risks">{len(risks)}</div></div>
+        <div class="metric metric-card" data-level="Critical"><div class="k">Critical</div><div class="v">{int(summary.get('critical', 0))}</div></div>
+        <div class="metric metric-card" data-level="High"><div class="k">High</div><div class="v">{int(summary.get('high', 0))}</div></div>
+        <div class="metric metric-card" data-level="Medium"><div class="k">Medium</div><div class="v">{int(summary.get('medium', 0))}</div></div>
+        <div class="metric metric-card" data-level="Low"><div class="k">Low</div><div class="v">{int(summary.get('low', 0))}</div></div>
         <div class="metric"><div class="k">开放端口 Open Ports</div><div class="v">{int(network_summary.get('open_ports', 0))}</div></div>
         <div class="metric"><div class="k">页面 URL</div><div class="v">{int(web_summary.get('urls', 0))}</div></div>
       </div>
+      <div class="quick-nav">
+        <a href="#overview">总览</a>
+        <a href="#filters">筛选区</a>
+        <a href="#risk-table">风险表</a>
+        <a href="#distribution">分布图</a>
+        <a href="#recommendations">建议区</a>
+        <button id="backToTopBtn" type="button">回到顶部</button>
+      </div>
     </section>
 
-    <section class="controls">
-      <input id="searchInput" class="input" placeholder="搜索标题、分类、插件或 URL" />
+    <section class="controls" id="filters">
+      <input id="searchInput" class="input control-search" placeholder="搜索标题、分类、插件或 URL" />
       <select id="levelSelect" class="select"><option value="">全部等级</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
       <select id="categorySelect" class="select"><option value="">全部分类</option></select>
       <select id="pluginSelect" class="select"><option value="">全部插件</option></select>
+      <select id="assetSelect" class="select"><option value="">全部目标资产</option></select>
+      <input id="statusMinInput" class="num" type="number" min="100" max="599" placeholder="状态码最小值(如 200)" />
+      <input id="statusMaxInput" class="num" type="number" min="100" max="599" placeholder="状态码最大值(如 399)" />
     </section>
 
     <section class="grid">
-      <article class="panel">
+      <article class="panel" id="risk-table">
         <div class="panel-head"><span>风险条目 Risk Items</span><span id="rowCounter">0 条</span></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>等级 Level</th><th>分数 Score</th><th>分类 Category</th><th>插件 Plugin</th><th>标题 Title</th><th>位置 URL</th></tr></thead>
+            <thead><tr><th>等级 Level</th><th>分数 Score</th><th>分类 Category</th><th>插件 Plugin</th><th>状态码</th><th>标题 Title</th><th>位置 URL</th></tr></thead>
             <tbody id="riskBody"></tbody>
           </table>
         </div>
       </article>
 
-      <aside class="panel">
+      <aside class="panel" id="distribution">
         <div class="panel-head">风险分布 Risk Distribution</div>
         <div class="plot">
           <div class="ring" id="ring"><div class="ring-t"><div><strong id="ringTotal">0</strong>总风险数</div></div></div>
@@ -296,6 +329,15 @@ class PresentationService:
           <button class="btn" id="exportBtn">导出筛选结果 JSON</button>
         </div>
       </aside>
+    </section>
+
+    <section class="panel" id="recommendations" style="margin-top:12px;">
+      <div class="panel-head"><span>修复建议 Recommendations</span><span id="recCounter">0 组</span></div>
+      <div class="stack-actions">
+        <button id="expandAllRecsBtn" type="button">全部展开</button>
+        <button id="collapseAllRecsBtn" type="button">全部折叠</button>
+      </div>
+      <div class="recommendation-list" id="recommendationList"></div>
     </section>
   </div>
 
@@ -329,6 +371,28 @@ class PresentationService:
     const levelSelect = document.getElementById('levelSelect');
     const categorySelect = document.getElementById('categorySelect');
     const pluginSelect = document.getElementById('pluginSelect');
+    const assetSelect = document.getElementById('assetSelect');
+    const statusMinInput = document.getElementById('statusMinInput');
+    const statusMaxInput = document.getElementById('statusMaxInput');
+    const recommendationList = document.getElementById('recommendationList');
+    const recCounter = document.getElementById('recCounter');
+    const metricCards = Array.from(document.querySelectorAll('.metric-card'));
+
+    const webUrls = Array.isArray(report?.assets?.web_assets?.urls) ? report.assets.web_assets.urls : [];
+    const urlStatusMap = new Map();
+
+    function normalizeUrl(url) {{
+      return String(url || '').trim().replace(/\\/+$/, '').toLowerCase();
+    }}
+
+    for (const entry of webUrls) {{
+      const raw = String(entry?.url || '').trim();
+      const key = normalizeUrl(raw);
+      const code = Number(entry?.status_code);
+      if (!key || Number.isNaN(code)) continue;
+      urlStatusMap.set(key, code);
+      urlStatusMap.set(raw.toLowerCase(), code);
+    }}
 
     function uniqueValues(key) {{
       return [...new Set(allItems.map(item => String(item?.[key] || '').trim()).filter(Boolean))].sort();
@@ -346,13 +410,49 @@ class PresentationService:
     fillSelect(categorySelect, uniqueValues('category'));
     fillSelect(pluginSelect, uniqueValues('plugin'));
 
+    function uniqueHosts() {{
+      const hosts = new Set();
+      for (const item of allItems) {{
+        const url = String(item?.location?.url || '');
+        if (!url) continue;
+        try {{
+          hosts.add(new URL(url).host);
+        }} catch (_err) {{
+          continue;
+        }}
+      }}
+      return [...hosts].sort();
+    }}
+
+    fillSelect(assetSelect, uniqueHosts());
+
     function normalizedLevel(level) {{
       return String(level || 'low').toLowerCase();
     }}
 
     function itemText(item) {{
       const url = String(item?.location?.url || '');
-      return [item?.title, item?.category, item?.plugin, url].join(' ').toLowerCase();
+      const param = String(item?.location?.param || '');
+      return [item?.title, item?.category, item?.plugin, url, param].join(' ').toLowerCase();
+    }}
+
+    function getStatusCode(item) {{
+      const url = String(item?.location?.url || '');
+      if (!url) return null;
+      const normalized = normalizeUrl(url);
+      if (urlStatusMap.has(normalized)) return urlStatusMap.get(normalized);
+      if (urlStatusMap.has(url.toLowerCase())) return urlStatusMap.get(url.toLowerCase());
+      return null;
+    }}
+
+    function getHost(item) {{
+      const url = String(item?.location?.url || '');
+      if (!url) return '';
+      try {{
+        return new URL(url).host;
+      }} catch (_err) {{
+        return '';
+      }}
     }}
 
     function getFilteredItems() {{
@@ -360,12 +460,26 @@ class PresentationService:
       const level = levelSelect.value;
       const category = categorySelect.value;
       const plugin = pluginSelect.value;
+      const asset = assetSelect.value;
+      const statusMin = Number(statusMinInput.value);
+      const statusMax = Number(statusMaxInput.value);
+      const hasStatusMin = !Number.isNaN(statusMin);
+      const hasStatusMax = !Number.isNaN(statusMax);
 
       return allItems
         .filter(item => !keyword || itemText(item).includes(keyword))
         .filter(item => !level || item.level === level)
         .filter(item => !category || item.category === category)
         .filter(item => !plugin || item.plugin === plugin)
+        .filter(item => !asset || getHost(item) === asset)
+        .filter(item => {{
+          if (!hasStatusMin && !hasStatusMax) return true;
+          const status = getStatusCode(item);
+          if (status === null) return false;
+          if (hasStatusMin && status < statusMin) return false;
+          if (hasStatusMax && status > statusMax) return false;
+          return true;
+        }})
         .sort((a, b) => Number(b.score || 0) - Number(a.score || 0));
     }}
 
@@ -383,11 +497,13 @@ class PresentationService:
       for (const item of items) {{
         const row = document.createElement('tr');
         const url = String(item?.location?.url || '-');
+        const status = getStatusCode(item);
         row.innerHTML = `
           <td><span class="badge ${{normalizedLevel(item.level)}}">${{item.level || 'Low'}}</span></td>
           <td>${{Number(item.score || 0).toFixed(2)}}</td>
           <td>${{item.category || '-'}}</td>
           <td>${{item.plugin || '-'}}</td>
+          <td>${{status === null ? '-' : status}}</td>
           <td>${{item.title || '-'}}</td>
           <td title="${{url}}">${{url.length > 54 ? url.slice(0, 51) + '...' : url}}</td>
         `;
@@ -397,6 +513,35 @@ class PresentationService:
       rowCounter.textContent = `${{items.length}} 条`;
       metricFindings.textContent = String(items.length);
       metricRisks.textContent = String(items.length);
+    }}
+
+    function renderRecommendations(items) {{
+      const grouped = new Map();
+      for (const item of items) {{
+        const category = String(item?.category || 'unknown');
+        const recommendation = String(item?.recommendation || '-');
+        const retest = String(item?.retest || '-');
+        const key = `${{category}}||${{recommendation}}||${{retest}}`;
+        const count = grouped.get(key)?.count || 0;
+        grouped.set(key, {{ category, recommendation, retest, count: count + 1 }});
+      }}
+
+      const rows = Array.from(grouped.values()).sort((a, b) => b.count - a.count);
+      recommendationList.innerHTML = '';
+      recCounter.textContent = `${{rows.length}} 组`;
+
+      for (const row of rows) {{
+        const item = document.createElement('details');
+        item.className = 'rec-item';
+        item.innerHTML = `
+          <summary><span>${{row.category}}</span><strong>${{row.count}} 条</strong></summary>
+          <div class="rec-body">
+            <div><strong>Recommendation:</strong> ${{row.recommendation}}</div>
+            <div style="margin-top:8px;"><strong>Retest:</strong> ${{row.retest}}</div>
+          </div>
+        `;
+        recommendationList.appendChild(item);
+      }}
     }}
 
     function renderRing(items) {{
@@ -424,14 +569,46 @@ class PresentationService:
       const items = getFilteredItems();
       renderTable(items);
       renderRing(items);
+      renderRecommendations(items);
+      syncMetricCardState();
     }}
 
-    [searchInput, levelSelect, categorySelect, pluginSelect].forEach(el => {{
+    function syncMetricCardState() {{
+      for (const card of metricCards) {{
+        const cardLevel = String(card.dataset.level || '');
+        const active = cardLevel && levelSelect.value === cardLevel;
+        card.classList.toggle('active', active);
+      }}
+    }}
+
+    [searchInput, levelSelect, categorySelect, pluginSelect, assetSelect, statusMinInput, statusMaxInput].forEach(el => {{
       el.addEventListener('input', renderAll);
       el.addEventListener('change', renderAll);
     }});
 
+    for (const card of metricCards) {{
+      card.addEventListener('click', () => {{
+        const cardLevel = String(card.dataset.level || '');
+        if (!cardLevel) {{
+          levelSelect.value = '';
+          renderAll();
+          return;
+        }}
+        levelSelect.value = levelSelect.value === cardLevel ? '' : cardLevel;
+        renderAll();
+        document.getElementById('risk-table').scrollIntoView({{ behavior: 'smooth', block: 'start' }});
+      }});
+    }}
+
     document.getElementById('closeDrawer').addEventListener('click', () => drawer.classList.remove('open'));
+    document.getElementById('backToTopBtn').addEventListener('click', () => window.scrollTo({{ top: 0, behavior: 'smooth' }}));
+
+    document.getElementById('expandAllRecsBtn').addEventListener('click', () => {{
+      recommendationList.querySelectorAll('details').forEach(node => node.open = true);
+    }});
+    document.getElementById('collapseAllRecsBtn').addEventListener('click', () => {{
+      recommendationList.querySelectorAll('details').forEach(node => node.open = false);
+    }});
 
     document.getElementById('exportBtn').addEventListener('click', () => {{
       const items = getFilteredItems();
