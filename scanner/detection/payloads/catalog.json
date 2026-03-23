@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "dictionary_version": "2026.03.23",
+  "updated_at": "2026-03-23T07:19:51.126357Z",
+  "changelog": [
+    {
+      "version": "2026.03.23",
+      "date": "2026-03-23",
+      "changes": [
+        "Incremental sync payload dictionaries from PayloadsAllTheThings@master",
+        "Imported payload counts: {'sqli': 99, 'xss': 177, 'csrf': 39, 'path_traversal': 83}"
+      ]
+    },
+    {
+      "version": "2026.03.23",
+      "date": "2026-03-23",
+      "changes": [
+        "Incremental sync payload dictionaries from PayloadsAllTheThings@master",
+        "Imported payload counts: {'sqli': 99, 'xss': 177, 'csrf': 39, 'path_traversal': 83}"
+      ]
+    },
+    {
+      "version": "2026.03.23",
+      "date": "2026-03-23",
+      "changes": [
+        "Initialize payload dictionaries for sqli, xss, csrf, and path_traversal",
+        "Add mode and risk metadata",
+        "Enable high-risk payload opt-in policy"
+      ]
+    }
+  ],
+  "categories": {
+    "sqli": "sqli.json",
+    "xss": "xss.json",
+    "csrf": "csrf.json",
+    "path_traversal": "path_traversal.json"
+  }
+}

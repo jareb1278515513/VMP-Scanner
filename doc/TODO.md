@@ -75,15 +75,18 @@
 
 ### 2.2 Payload 字典管理（参考 PayloadsAllTheThings）
 
-- [ ] 建立 scanner/payloads 目录和分类字典文件
-- [ ] 按漏洞分类维护字典（sqli/xss/csrf/path_traversal）
-- [ ] 为每个 payload 增加元数据（用途、风险等级、预期特征）
-- [ ] 区分测试模式与攻击模式 payload
-- [ ] 增加字典版本号和更新记录
+- [x] 建立 scanner/payloads 目录和分类字典文件
+- [x] 按漏洞分类维护字典（sqli/xss/csrf/path_traversal）
+- [x] 为每个 payload 增加元数据（用途、风险等级、预期特征）
+- [x] 区分测试模式与攻击模式 payload
+- [x] 增加字典版本号和更新记录
 
 交付标准：
-- [ ] 插件可按漏洞类型加载对应 payload 集合
-- [ ] 高风险 payload 默认禁用，需显式开启
+- [x] 插件可按漏洞类型加载对应 payload 集合
+- [x] 高风险 payload 默认禁用，需显式开启
+
+测试记录：
+- `uv run --with pytest pytest -q`（新增 payload 字典管理测试）-> 13 passed
 
 ### 2.3 首批漏洞插件
 

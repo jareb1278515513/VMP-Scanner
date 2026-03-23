@@ -7,6 +7,7 @@ from pathlib import Path
 
 from scanner.collection import CollectionService
 from scanner.detection import DetectionExecutor
+from scanner.detection.payloads import sync_from_open_source
 
 
 @dataclass(frozen=True)
@@ -31,6 +32,11 @@ class DefaultConfig:
     auth_submit_value: str | None = None
     auth_success_keyword: str | None = None
     auth_extra: list[str] | None = None
+    sync_payloads: bool = False
+    payload_sync_ref: str = "master"
+    payload_sync_max_per_category: int = 200
+    payload_sync_timeout: float = 20.0
+    payload_sync_incremental: bool = False
     crawler_output_json: str | None = None
     grab_banner: bool = False
 
@@ -113,6 +119,33 @@ def build_parser() -> argparse.ArgumentParser:
         help="Additional login form value in key=value format (repeatable)",
     )
     parser.add_argument(
+        "--sync-payloads",
+        action="store_true",
+        help="Sync payload dictionaries from open-source repository before scanning",
+    )
+    parser.add_argument(
+        "--payload-sync-ref",
+        default="master",
+        help="Git ref (branch/tag/commit) used when syncing payload dictionaries",
+    )
+    parser.add_argument(
+        "--payload-sync-max-per-category",
+        type=int,
+        default=200,
+        help="Maximum payload entries imported per category during sync",
+    )
+    parser.add_argument(
+        "--payload-sync-timeout",
+        type=float,
+        default=20.0,
+        help="HTTP timeout in seconds for payload sync",
+    )
+    parser.add_argument(
+        "--payload-sync-incremental",
+        action="store_true",
+        help="Use incremental merge strategy when syncing payload dictionaries",
+    )
+    parser.add_argument(
         "--crawler-output-json",
         help="Write crawler report JSON to this path",
     )
@@ -174,6 +207,16 @@ def load_runtime_config(args: argparse.Namespace) -> dict:
         config["auth_success_keyword"] = args.auth_success_keyword
     if args.auth_extra is not None:
         config["auth_extra"] = args.auth_extra
+    if args.sync_payloads:
+        config["sync_payloads"] = True
+    if args.payload_sync_ref is not None:
+        config["payload_sync_ref"] = args.payload_sync_ref
+    if args.payload_sync_max_per_category is not None:
+        config["payload_sync_max_per_category"] = args.payload_sync_max_per_category
+    if args.payload_sync_timeout is not None:
+        config["payload_sync_timeout"] = args.payload_sync_timeout
+    if args.payload_sync_incremental:
+        config["payload_sync_incremental"] = True
     if args.crawler_output_json is not None:
         config["crawler_output_json"] = args.crawler_output_json
     if args.grab_banner:
@@ -200,6 +243,21 @@ def main() -> int:
     try:
         runtime_config = load_runtime_config(args)
         logging.info("Runtime config: %s", json.dumps(runtime_config, ensure_ascii=False))
+
+        if runtime_config.get("sync_payloads"):
+            counts = sync_from_open_source(
+                base_dir=Path("scanner") / "detection" / "payloads",
+                repo_ref=runtime_config["payload_sync_ref"],
+                timeout=runtime_config["payload_sync_timeout"],
+                max_per_category=runtime_config["payload_sync_max_per_category"],
+                incremental=runtime_config["payload_sync_incremental"],
+            )
+            logging.info(
+                "Payload sync completed: ref=%s, incremental=%s, counts=%s",
+                runtime_config["payload_sync_ref"],
+                runtime_config["payload_sync_incremental"],
+                counts,
+            )
 
         collection_service = CollectionService()
         collection_bundle = collection_service.collect(
