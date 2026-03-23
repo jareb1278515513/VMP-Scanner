@@ -56,35 +56,55 @@ class CollectionService:
         if normalized_request.crawler.enabled and parsed_target.scheme in ("http", "https"):
             try:
                 crawl_session = None
+                crawler_cookies = parse_cookie_header(normalized_request.crawler.cookie_header)
+                session_cookies: dict[str, str] = {}
                 if normalized_request.crawler.auth.enabled:
                     auth = normalized_request.crawler.auth
-                    crawl_session = build_form_login_session(
-                        base_url=normalized_request.target,
-                        login_url=auth.login_url,
-                        username=auth.username,
-                        password=auth.password,
-                        timeout=normalized_request.timeout,
-                        username_field=auth.username_field,
-                        password_field=auth.password_field,
-                        csrf_field=auth.csrf_field,
-                        submit_field=auth.submit_field,
-                        submit_value=auth.submit_value,
-                        success_keyword=auth.success_keyword,
-                        extra_form_fields=parse_key_value_pairs(auth.extra_fields),
-                    )
+                    auth_extra_fields = parse_key_value_pairs(auth.extra_fields)
+                    login_kwargs = {
+                        "base_url": normalized_request.target,
+                        "login_url": auth.login_url,
+                        "username": auth.username,
+                        "password": auth.password,
+                        "timeout": normalized_request.timeout,
+                        "username_field": auth.username_field,
+                        "password_field": auth.password_field,
+                        "csrf_field": auth.csrf_field,
+                        "submit_field": auth.submit_field,
+                        "submit_value": auth.submit_value,
+                        "success_keyword": auth.success_keyword,
+                        "extra_form_fields": auth_extra_fields,
+                    }
+                    crawl_session = build_form_login_session(**login_kwargs)
 
                     cookie_jar = getattr(crawl_session, "cookies", None)
                     if cookie_jar is not None and hasattr(cookie_jar, "get_dict"):
-                        bundle.metadata["session_cookies"] = cookie_jar.get_dict()
+                        session_cookies.update(cookie_jar.get_dict())
+
+                    security_value = auth_extra_fields.get("security")
+                    if security_value is not None and "security" not in session_cookies:
+                        session_cookies["security"] = str(security_value)
+
+                if crawler_cookies:
+                    session_cookies.update(crawler_cookies)
+                if session_cookies:
+                    bundle.metadata["session_cookies"] = session_cookies
 
                 bundle.web_assets = crawl_web_state(
                     start_url=normalized_request.target,
                     max_depth=normalized_request.crawler.max_depth,
                     timeout=normalized_request.timeout,
                     allowed_domains=normalized_request.crawler.allowed_domains,
-                    cookies=parse_cookie_header(normalized_request.crawler.cookie_header),
+                    cookies=crawler_cookies,
                     session=crawl_session,
                 )
+
+                if normalized_request.crawler.auth.enabled:
+                    refreshed_session = build_form_login_session(**login_kwargs)
+                    refreshed_jar = getattr(refreshed_session, "cookies", None)
+                    if refreshed_jar is not None and hasattr(refreshed_jar, "get_dict"):
+                        session_cookies.update(refreshed_jar.get_dict())
+                        bundle.metadata["session_cookies"] = session_cookies
             except Exception as exc:
                 bundle.errors.append(f"crawler_collection_failed: {exc}")
                 bundle.web_assets = {

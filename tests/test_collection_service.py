@@ -19,8 +19,18 @@ def test_collection_service_returns_bundle_with_network_and_web_assets(monkeypat
     ) -> list[dict]:
         return [{"host": host, "port": 80, "status": "open", "service_guess": "http"}]
 
+    login_calls = {"count": 0}
+
+    class _FakeCookieJar:
+        def get_dict(self) -> dict[str, str]:
+            return {"PHPSESSID": "from-login"}
+
+    class _FakeSession:
+        cookies = _FakeCookieJar()
+
     def fake_build_form_login_session(**kwargs):
-        return object()
+        login_calls["count"] += 1
+        return _FakeSession()
 
     def fake_crawl_web_state(
         start_url: str,
@@ -73,7 +83,7 @@ def test_collection_service_returns_bundle_with_network_and_web_assets(monkeypat
                     "enabled": True,
                     "username": "user",
                     "password": "pass",
-                    "extra_fields": ["tenant=dev"],
+                    "extra_fields": ["tenant=dev", "security=low"],
                 },
             },
             "metadata": {"request_id": "abc"},
@@ -86,6 +96,10 @@ def test_collection_service_returns_bundle_with_network_and_web_assets(monkeypat
     assert bundle["web_assets"]["visited_count"] == 1
     assert bundle["errors"] == []
     assert bundle["metadata"]["request_id"] == "abc"
+    assert bundle["metadata"]["session_cookies"]["PHPSESSID"] == "from-login"
+    assert bundle["metadata"]["session_cookies"]["security"] == "low"
+    assert bundle["metadata"]["session_cookies"]["session"] == "abc"
+    assert login_calls["count"] == 2
 
 
 def test_collection_service_captures_crawler_error_without_crashing(monkeypatch) -> None:

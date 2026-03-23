@@ -55,10 +55,20 @@ class ReflectedXssPlugin(DetectionPlugin):
         for target in targets[:max_targets]:
             base_url = target["url"]
             target_param = target["param"]
-            probe_url = _with_param(base_url, target_param, injection)
+            method = str(target.get("method") or "GET").upper()
+            probe_url = base_url
+            request_data = None
 
             try:
-                resp = session.get(probe_url, timeout=timeout, allow_redirects=True)
+                if method == "POST":
+                    request_data = dict(target.get("form_data") or {})
+                    request_data[target_param] = injection
+                    resp = session.post(base_url, data=request_data, timeout=timeout, allow_redirects=True)
+                else:
+                    request_data = dict(target.get("form_data") or {})
+                    request_data[target_param] = injection
+                    probe_url = _with_params(base_url, request_data)
+                    resp = session.get(probe_url, timeout=timeout, allow_redirects=True)
             except requests.RequestException:
                 continue
 
@@ -68,11 +78,14 @@ class ReflectedXssPlugin(DetectionPlugin):
             escaped_marker_l = html.escape(marker).lower()
 
             contains_marker = marker_l in body_l
-            contains_escaped = escaped_marker_l in body_l
-            contains_raw = contains_marker and not contains_escaped
+            contains_escaped = escaped_marker_l != marker_l and escaped_marker_l in body_l
+            contains_raw = contains_marker
 
             if mode == "attack":
-                executable_pattern = "<script>" in body and marker in body
+                executable_pattern = contains_raw and any(
+                    pattern in body_l
+                    for pattern in ("<script", "onerror", "onload", "javascript:")
+                )
                 if not executable_pattern:
                     continue
             else:
@@ -88,12 +101,14 @@ class ReflectedXssPlugin(DetectionPlugin):
                     "confidence": 0.92 if executable_pattern else (0.88 if contains_raw else 0.7),
                     "location": {
                         "url": base_url,
-                        "method": "GET",
+                        "method": method,
                         "param": target_param,
                     },
                     "raw": {
                         "mode": mode,
+                        "request_method": method,
                         "probe_url": probe_url,
+                        "request_data": request_data,
                         "status": resp.status_code,
                         "marker": marker,
                         "payload": injection,
@@ -127,6 +142,15 @@ def _with_param(url: str, name: str, value: str) -> str:
     return urlunparse(parsed._replace(query=new_query))
 
 
+def _with_params(url: str, values: dict[str, str]) -> str:
+    parsed = urlparse(url)
+    query = parse_qs(parsed.query, keep_blank_values=True)
+    for key, value in values.items():
+        query[str(key)] = [str(value)]
+    new_query = urlencode(query, doseq=True)
+    return urlunparse(parsed._replace(query=new_query))
+
+
 def _build_probe_targets(collection_bundle: dict) -> list[dict]:
     web_assets = collection_bundle.get("web_assets") or {}
 
@@ -136,31 +160,74 @@ def _build_probe_targets(collection_bundle: dict) -> list[dict]:
     for item in web_assets.get("urls", []):
         base_url = str(item.get("url") or "")
         for param in item.get("params") or []:
-            key = (base_url, str(param))
+            key = (base_url, "GET", str(param))
             if not base_url or key in seen:
                 continue
             seen.add(key)
-            targets.append({"url": base_url, "param": str(param)})
+            targets.append({"url": base_url, "param": str(param), "method": "GET", "form_data": {}})
 
     for form in web_assets.get("forms", []):
         method = str(form.get("method") or "GET").upper()
         action = str(form.get("action") or "")
-        if method != "GET" or not action.startswith(("http://", "https://")):
+        if method not in {"GET", "POST"} or not action.startswith(("http://", "https://")):
             continue
 
-        for field in form.get("fields") or []:
+        fields = form.get("fields") or []
+        baseline_data = _build_form_baseline(fields)
+        if method == "GET" and not any(
+            str(field.get("input_type") or "").lower() in {"submit", "button"}
+            and str(field.get("name") or "")
+            for field in fields
+        ):
+            baseline_data.setdefault("Submit", "Submit")
+
+        for field in fields:
             name = str(field.get("name") or "")
             input_type = str(field.get("input_type") or "text").lower()
             if not name or input_type in {"hidden", "submit", "button"}:
                 continue
-            key = (action, name)
+            key = (action, method, name)
             if key in seen:
                 continue
             seen.add(key)
-            targets.append({"url": action, "param": name})
-            break
+            targets.append(
+                {
+                    "url": action,
+                    "param": name,
+                    "method": method,
+                    "form_data": dict(baseline_data),
+                }
+            )
 
     return targets
+
+
+def _build_form_baseline(fields: list[dict]) -> dict[str, str]:
+    data: dict[str, str] = {}
+    first_submit: str | None = None
+
+    for field in fields:
+        name = str(field.get("name") or "")
+        if not name:
+            continue
+
+        input_type = str(field.get("input_type") or "text").lower()
+        if input_type in {"submit", "button"}:
+            if first_submit is None:
+                first_submit = name
+            continue
+        if input_type == "hidden":
+            continue
+        if input_type in {"checkbox", "radio"}:
+            data[name] = "on"
+            continue
+
+        data[name] = "vmp"
+
+    if first_submit:
+        data[first_submit] = "Submit"
+
+    return data
 
 
 def _apply_session_cookies(session: requests.Session, collection_bundle: dict) -> None:
@@ -191,14 +258,16 @@ def _pick_xss_payload(payloads: list[dict], mode: str) -> dict | None:
 
 
 def _build_injection(payload: str, marker: str, mode: str) -> str:
+    if mode == "attack":
+        if payload and "<script" in payload.lower() and "</script>" in payload.lower():
+            return payload.replace("</script>", f"{marker}</script>", 1)
+        return f"<script>console.log('{marker}')</script>"
+
     if not payload:
-        return f"<script>console.log('{marker}')</script>" if mode == "attack" else f"<vmp>{marker}</vmp>"
+        return f"<vmp>{marker}</vmp>"
 
     if marker in payload:
         return payload
-
-    if mode == "attack" and "<script" in payload.lower() and "</script>" in payload.lower():
-        return payload.replace("</script>", f"/*{marker}*/</script>", 1)
 
     if mode == "detect" or mode == "test":
         return f"{payload}<!--{marker}-->"
