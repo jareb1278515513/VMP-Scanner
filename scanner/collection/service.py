@@ -73,6 +73,10 @@ class CollectionService:
                         extra_form_fields=parse_key_value_pairs(auth.extra_fields),
                     )
 
+                    cookie_jar = getattr(crawl_session, "cookies", None)
+                    if cookie_jar is not None and hasattr(cookie_jar, "get_dict"):
+                        bundle.metadata["session_cookies"] = cookie_jar.get_dict()
+
                 bundle.web_assets = crawl_web_state(
                     start_url=normalized_request.target,
                     max_depth=normalized_request.crawler.max_depth,

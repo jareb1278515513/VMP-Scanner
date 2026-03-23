@@ -37,6 +37,12 @@ class DefaultConfig:
     payload_sync_max_per_category: int = 200
     payload_sync_timeout: float = 20.0
     payload_sync_incremental: bool = False
+    enable_plugins: list[str] | None = None
+    disable_plugins: list[str] | None = None
+    detection_plugin_timeout: float | None = None
+    detection_plugin_max_targets: int | None = None
+    plugin_timeout: list[str] | None = None
+    plugin_max_targets: list[str] | None = None
     crawler_output_json: str | None = None
     grab_banner: bool = False
 
@@ -146,6 +152,38 @@ def build_parser() -> argparse.ArgumentParser:
         help="Use incremental merge strategy when syncing payload dictionaries",
     )
     parser.add_argument(
+        "--enable-plugin",
+        action="append",
+        dest="enable_plugins",
+        help="Enable only specified detection plugin(s), repeatable",
+    )
+    parser.add_argument(
+        "--disable-plugin",
+        action="append",
+        dest="disable_plugins",
+        help="Disable specified detection plugin(s), repeatable",
+    )
+    parser.add_argument(
+        "--detection-plugin-timeout",
+        type=float,
+        help="Default timeout in seconds for detection plugins",
+    )
+    parser.add_argument(
+        "--detection-plugin-max-targets",
+        type=int,
+        help="Default target limit for detection plugins",
+    )
+    parser.add_argument(
+        "--plugin-timeout",
+        action="append",
+        help="Per-plugin timeout override in plugin=seconds format (repeatable)",
+    )
+    parser.add_argument(
+        "--plugin-max-targets",
+        action="append",
+        help="Per-plugin target limit override in plugin=count format (repeatable)",
+    )
+    parser.add_argument(
         "--crawler-output-json",
         help="Write crawler report JSON to this path",
     )
@@ -217,6 +255,18 @@ def load_runtime_config(args: argparse.Namespace) -> dict:
         config["payload_sync_timeout"] = args.payload_sync_timeout
     if args.payload_sync_incremental:
         config["payload_sync_incremental"] = True
+    if args.enable_plugins is not None:
+        config["enable_plugins"] = args.enable_plugins
+    if args.disable_plugins is not None:
+        config["disable_plugins"] = args.disable_plugins
+    if args.detection_plugin_timeout is not None:
+        config["detection_plugin_timeout"] = args.detection_plugin_timeout
+    if args.detection_plugin_max_targets is not None:
+        config["detection_plugin_max_targets"] = args.detection_plugin_max_targets
+    if args.plugin_timeout is not None:
+        config["plugin_timeout"] = args.plugin_timeout
+    if args.plugin_max_targets is not None:
+        config["plugin_max_targets"] = args.plugin_max_targets
     if args.crawler_output_json is not None:
         config["crawler_output_json"] = args.crawler_output_json
     if args.grab_banner:
@@ -230,6 +280,99 @@ def configure_logging(level: str) -> None:
         level=getattr(logging, level.upper(), logging.INFO),
         format="%(asctime)s | %(levelname)s | %(message)s",
     )
+
+
+PLUGIN_OPTION_ALIASES = {
+    "sqli_basic": "sqli",
+    "xss_reflected": "xss",
+    "sensitive_path": "sensitive_path",
+    "weak_password_policy": "weak_password",
+    "csrf_missing_token": "csrf_missing_token",
+    "suspicious_endpoint": "suspicious_endpoint",
+}
+
+
+def _parse_plugin_value_pairs(items: list[str] | None, cast):
+    result: dict[str, int | float] = {}
+    if not items:
+        return result
+
+    for item in items:
+        if "=" not in item:
+            raise ValueError(f"Invalid plugin override format: {item}, expected plugin=value")
+        name, value = item.split("=", 1)
+        plugin_name = name.strip().lower()
+        if not plugin_name:
+            raise ValueError(f"Invalid plugin name in override: {item}")
+        result[plugin_name] = cast(value.strip())
+    return result
+
+
+def build_detection_metadata(runtime_config: dict) -> dict:
+    defaults_timeout = runtime_config.get("detection_plugin_timeout")
+    defaults_max_targets = runtime_config.get("detection_plugin_max_targets")
+    timeout_overrides = _parse_plugin_value_pairs(runtime_config.get("plugin_timeout"), float)
+    max_target_overrides = _parse_plugin_value_pairs(runtime_config.get("plugin_max_targets"), int)
+
+    detection: dict[str, dict] = {}
+    for plugin_name, alias in PLUGIN_OPTION_ALIASES.items():
+        options: dict[str, int | float | bool] = {}
+
+        timeout_value = timeout_overrides.get(plugin_name)
+        if timeout_value is None:
+            timeout_value = timeout_overrides.get(alias)
+        if timeout_value is None:
+            timeout_value = defaults_timeout
+        if timeout_value is not None:
+            options["timeout"] = float(timeout_value)
+
+        max_targets_value = max_target_overrides.get(plugin_name)
+        if max_targets_value is None:
+            max_targets_value = max_target_overrides.get(alias)
+        if max_targets_value is None:
+            max_targets_value = defaults_max_targets
+
+        if max_targets_value is not None:
+            normalized_limit = int(max_targets_value)
+            if alias == "sensitive_path":
+                options["max_paths"] = normalized_limit
+            elif alias == "weak_password":
+                options["max_attempts"] = normalized_limit
+            else:
+                options["max_targets"] = normalized_limit
+
+        if alias == "weak_password":
+            options["enable_active_probe"] = runtime_config.get("mode") == "attack"
+
+        if options:
+            detection[plugin_name] = dict(options)
+            if alias != plugin_name:
+                detection[alias] = dict(options)
+
+    return detection
+
+
+def resolve_enabled_plugins(runtime_config: dict, available_plugins: list[str]) -> list[str] | None:
+    available_set = {name.lower() for name in available_plugins}
+
+    enabled = runtime_config.get("enable_plugins") or []
+    disabled = runtime_config.get("disable_plugins") or []
+
+    if not enabled and not disabled:
+        return None
+
+    if enabled:
+        selected = {item.strip().lower() for item in enabled if item and item.strip()}
+    else:
+        selected = set(available_set)
+
+    for item in disabled:
+        if not item:
+            continue
+        selected.discard(item.strip().lower())
+
+    resolved = sorted(name for name in available_plugins if name.lower() in selected)
+    return resolved
 
 
 def main() -> int:
@@ -260,6 +403,7 @@ def main() -> int:
             )
 
         collection_service = CollectionService()
+        detection_metadata = build_detection_metadata(runtime_config)
         collection_bundle = collection_service.collect(
             {
                 "target": runtime_config["target"],
@@ -293,6 +437,7 @@ def main() -> int:
                 "metadata": {
                     "tool": "vmp-scanner",
                     "entrypoint": "main.py",
+                    "detection": detection_metadata,
                 },
             }
         )
@@ -344,9 +489,18 @@ def main() -> int:
         logging.debug("Collection bundle: %s", json.dumps(collection_bundle, ensure_ascii=False))
 
         detection_executor = DetectionExecutor()
+        available_plugins = [
+            plugin.metadata().get("name", plugin.__class__.__name__)
+            for plugin in detection_executor.registry.list_plugins()
+        ]
+        enabled_plugins = resolve_enabled_plugins(runtime_config, available_plugins)
+        if enabled_plugins is not None:
+            logging.info("Enabled detection plugins: %s", enabled_plugins)
+
         finding_bundle = detection_executor.run(
             collection_bundle=collection_bundle,
             mode=runtime_config["mode"],
+            enabled_plugins=enabled_plugins,
         )
         logging.info(
             "Detection completed: findings=%d, plugins(total=%d, success=%d, failed=%d, skipped=%d)",
