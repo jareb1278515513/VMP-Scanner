@@ -62,6 +62,14 @@ xss_payloads = load_payloads("xss", mode="test")
 
 默认同步源：PayloadsAllTheThings（GitHub raw 文本）。
 
+推荐调用方式（从项目根目录执行，避免路径相关导入问题）：
+
+```bash
+uv run python -m tools.sync_payloads --payload-dir scanner/detection/payloads --repo-ref master --max-per-category 200
+```
+
+兼容调用方式（当前也已支持）：
+
 同步命令：
 
 ```bash
