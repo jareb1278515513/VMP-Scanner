@@ -9,6 +9,7 @@ LOGIN_URL="/login.php"
 USERNAME="admin"
 PASSWORD="password"
 REPORT_DIR="reports"
+XSS_MAX_TARGETS=50
 
 usage() {
   cat <<'EOF'
@@ -23,6 +24,7 @@ Options:
   --username USER           Login username (default: admin)
   --password PASS           Login password (default: password)
   --report-dir DIR          Report base directory (default: reports)
+  --xss-max-targets N       XSS plugin max targets override (default: 50)
   -h, --help                Show this help
 EOF
 }
@@ -59,6 +61,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --report-dir)
       REPORT_DIR="$2"
+      shift 2
+      ;;
+    --xss-max-targets)
+      XSS_MAX_TARGETS="$2"
       shift 2
       ;;
     -h|--help)
@@ -103,6 +109,7 @@ if ! uv run main.py \
   --auth-submit-value Login \
   --auth-success-keyword logout.php \
   --auth-extra security=low \
+  --plugin-max-targets "xss_reflected=$XSS_MAX_TARGETS" \
   --report-json "$json_report" \
   --report-markdown "$md_report" \
   --report-html "$html_report" \
