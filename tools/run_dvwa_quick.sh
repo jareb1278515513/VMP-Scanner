@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-TARGET="http://127.0.0.1/dvwa/"
+TARGET="http://127.0.0.1/"
 ALLOWED_DOMAIN="127.0.0.1"
 MODE="attack"
 MAX_DEPTH=10
-LOGIN_URL="/dvwa/login.php"
+LOGIN_URL="/login.php"
 USERNAME="admin"
 PASSWORD="password"
 REPORT_DIR="reports"
@@ -15,11 +15,11 @@ usage() {
 Usage: run_dvwa_quick.sh [options]
 
 Options:
-  --target URL              Target URL (default: http://127.0.0.1/dvwa/)
+  --target URL              Target URL (default: http://127.0.0.1/)
   --allowed-domain DOMAIN   Allowed crawler domain (default: 127.0.0.1)
   --mode MODE               Scanner mode: detect|test|attack (default: attack)
   --max-depth N             Crawler max depth (default: 10)
-  --login-url URL           Login URL path (default: /dvwa/login.php)
+  --login-url URL           Login URL path (default: /login.php)
   --username USER           Login username (default: admin)
   --password PASS           Login password (default: password)
   --report-dir DIR          Report base directory (default: reports)
