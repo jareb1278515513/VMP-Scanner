@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VMP-SCANNER 安全风险报告</title>
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --card: rgba(255,255,255,0.78);
+      --ink: #111113;
+      --muted: #6e6e73;
+      --line: rgba(10,10,10,.08);
+      --critical: #c81e1e;
+      --high: #e46f2a;
+      --medium: #c99700;
+      --low: #2f8f4e;
+      --accent: #0071e3;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "SF Pro Display", "SF Pro Text", "Avenir Next", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 0 0, rgba(0,113,227,.15), transparent 38%), var(--bg);
+    }
+    .wrap { width: min(96vw, 1680px); margin: 0 auto; padding: 28px 18px 40px; }
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(255,255,255,.95), rgba(246,246,248,.86));
+      box-shadow: 0 16px 46px rgba(0,0,0,.08);
+      padding: 24px;
+    }
+    h1 { margin: 0; font-size: clamp(30px, 3.8vw, 44px); }
+    .sub { margin-top: 8px; color: var(--muted); }
+    .chips { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-size: 12px; background: #fff; }
+    .metrics { margin-top: 14px; display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0,1fr)); }
+    .metric { border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 12px; }
+    .metric-card { cursor: pointer; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+    .metric-card:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.08); }
+    .metric-card.active { border-color: rgba(0,113,227,.6); box-shadow: 0 0 0 2px rgba(0,113,227,.14); }
+    .metric .k { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .metric .v { margin-top: 4px; font-size: 26px; font-weight: 640; }
+    .quick-nav { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .quick-nav a, .quick-nav button { text-decoration: none; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 999px; padding: 7px 10px; font-size: 12px; cursor: pointer; }
+    .controls {
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-items: center;
+    }
+    .control-search { grid-column: span 2; }
+    .input, .select { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 11px 12px; }
+    .num { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: #fff; padding: 11px 12px; }
+    .grid { margin-top: 14px; display: grid; gap: 12px; grid-template-columns: 1.35fr .95fr; }
+    .panel { border: 1px solid var(--line); border-radius: 20px; background: var(--card); box-shadow: 0 10px 30px rgba(0,0,0,.06); overflow: hidden; }
+    .panel-head { padding: 14px 16px; border-bottom: 1px solid var(--line); font-weight: 600; display: flex; justify-content: space-between; }
+    .table-wrap { max-height: 560px; overflow: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 12px 12px; border-bottom: 1px solid rgba(10,10,10,.06); }
+    thead th { position: sticky; top: 0; background: #fafafc; z-index: 1; color: #56565b; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: rgba(0,113,227,.06); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      white-space: nowrap;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      line-height: 1;
+      color: #fff;
+      font-weight: 700;
+    }
+    .critical { background: var(--critical); }
+    .high { background: var(--high); }
+    .medium { background: var(--medium); }
+    .low { background: var(--low); }
+    .plot { padding: 16px; }
+    .ring { width: min(280px, 72%); aspect-ratio: 1; margin: 0 auto; border-radius: 50%; position: relative; }
+    .ring::after { content: ""; position: absolute; inset: 20%; background: #fff; border-radius: 50%; box-shadow: 0 0 0 1px var(--line); }
+    .ring-t { position: absolute; inset: 0; display: grid; place-items: center; z-index: 2; text-align: center; font-size: 12px; color: var(--muted); }
+    .ring-t strong { display: block; color: var(--ink); font-size: 28px; }
+    .legend { margin-top: 14px; display: grid; gap: 7px; }
+    .legend div { display: flex; justify-content: space-between; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+    .btn { margin-top: 14px; width: 100%; border: none; border-radius: 10px; background: var(--accent); color: #fff; padding: 10px; cursor: pointer; }
+    .stack-actions { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px 0; }
+    .stack-actions button { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 10px; cursor: pointer; }
+    .recommendation-list { padding: 12px 16px 16px; display: grid; gap: 10px; }
+    .rec-item { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; }
+    .rec-item > summary { cursor: pointer; list-style: none; padding: 10px 12px; display: flex; justify-content: space-between; gap: 8px; }
+    .rec-item > summary::-webkit-details-marker { display: none; }
+    .rec-body { border-top: 1px solid var(--line); padding: 10px 12px; color: #3a3a3c; font-size: 13px; }
+    .drawer { position: fixed; right: -560px; top: 0; width: min(560px, 92vw); height: 100vh; background: rgba(255,255,255,.96); border-left: 1px solid var(--line); transition: right .22s; padding: 16px; overflow: auto; z-index: 30; }
+    .drawer.open { right: 0; }
+    .kv { border: 1px solid var(--line); border-radius: 10px; background: #fafafc; white-space: pre-wrap; word-break: break-word; padding: 10px; font-size: 12px; max-height: 220px; overflow: auto; }
+    @media (max-width: 1040px) { .metrics { grid-template-columns: repeat(2, minmax(0,1fr)); } .controls { grid-template-columns: 1fr 1fr; } .control-search { grid-column: span 2; } .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .metrics { grid-template-columns: 1fr; } .controls { grid-template-columns: 1fr; } .control-search { grid-column: span 1; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero" id="overview">
+      <h1>VMP-SCANNER 安全风险总览</h1>
+      <div class="sub">目标：http://127.0.0.1/</div>
+      <div class="chips">
+        <span class="chip">项目：VMP-SCANNER</span>
+        <span class="chip">生成时间：2026-03-24T08:59:50.686222Z</span>
+        <span class="chip">模式：attack</span>
+        <span class="chip">版本：0.1.0</span>
+      </div>
+      <div class="metrics">
+        <div class="metric metric-card" data-level=""><div class="k">发现数</div><div class="v" id="metric-findings">22</div></div>
+        <div class="metric metric-card" data-level=""><div class="k">风险数</div><div class="v" id="metric-risks">22</div></div>
+        <div class="metric metric-card" data-level="Critical"><div class="k">严重</div><div class="v">0</div></div>
+        <div class="metric metric-card" data-level="High"><div class="k">高危</div><div class="v">4</div></div>
+        <div class="metric metric-card" data-level="Medium"><div class="k">中危</div><div class="v">14</div></div>
+        <div class="metric metric-card" data-level="Low"><div class="k">低危</div><div class="v">4</div></div>
+        <div class="metric"><div class="k">开放端口</div><div class="v">1</div></div>
+        <div class="metric"><div class="k">页面 URL</div><div class="v">38</div></div>
+      </div>
+      <div class="quick-nav">
+        <a href="#overview">总览</a>
+        <a href="#filters">筛选区</a>
+        <a href="#risk-table">风险表</a>
+        <a href="#distribution">分布图</a>
+        <a href="#recommendations">建议区</a>
+        <button id="backToTopBtn" type="button">回到顶部</button>
+      </div>
+    </section>
+
+    <section class="controls" id="filters">
+      <input id="searchInput" class="input control-search" placeholder="搜索标题、分类、插件或 URL" />
+      <select id="levelSelect" class="select"><option value="">全部等级</option><option value="Critical">严重</option><option value="High">高危</option><option value="Medium">中危</option><option value="Low">低危</option></select>
+      <select id="categorySelect" class="select"><option value="">全部分类</option></select>
+      <select id="pluginSelect" class="select"><option value="">全部插件</option></select>
+      <select id="assetSelect" class="select"><option value="">全部目标资产</option></select>
+      <input id="statusMinInput" class="num" type="number" min="100" max="599" placeholder="状态码最小值(如 200)" />
+      <input id="statusMaxInput" class="num" type="number" min="100" max="599" placeholder="状态码最大值(如 399)" />
+    </section>
+
+    <section class="grid">
+      <article class="panel" id="risk-table">
+        <div class="panel-head"><span>风险条目</span><span id="rowCounter">0 条</span></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>等级</th><th>分数</th><th>分类</th><th>插件</th><th>状态码</th><th>标题</th><th>位置 URL</th></tr></thead>
+            <tbody id="riskBody"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="panel" id="distribution">
+        <div class="panel-head">风险分布</div>
+        <div class="plot">
+          <div class="ring" id="ring"><div class="ring-t"><div><strong id="ringTotal">0</strong>总风险数</div></div></div>
+          <div class="legend" id="legend"></div>
+          <button class="btn" id="exportBtn">导出筛选结果 JSON</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel" id="recommendations" style="margin-top:12px;">
+      <div class="panel-head"><span>修复建议</span><span id="recCounter">0 组</span></div>
+      <div class="stack-actions">
+        <button id="expandAllRecsBtn" type="button">全部展开</button>
+        <button id="collapseAllRecsBtn" type="button">全部折叠</button>
+      </div>
+      <div class="recommendation-list" id="recommendationList"></div>
+    </section>
+  </div>
+
+  <aside id="drawer" class="drawer">
+    <button id="closeDrawer">关闭</button>
+    <h2 id="detailTitle">风险详情</h2>
+    <p id="detailMeta"></p>
+    <h4>修复建议</h4>
+    <div id="detailRecommendation" class="kv"></div>
+    <h4>复测建议</h4>
+    <div id="detailRetest" class="kv"></div>
+    <h4>证据</h4>
+    <div id="detailEvidence" class="kv"></div>
+  </aside>
+
+  <script id="report-data" type="application/json">{"schema_version": "1.0", "generated_at": "2026-03-24T08:59:50.686222Z", "target": "http://127.0.0.1/", "metadata": {"mode": "attack", "tool_version": "0.1.0", "args": {"target": "http://127.0.0.1/", "mode": "attack", "max_depth": 10, "concurrency": 20, "timeout": 1.0, "ports": "80,443,8080,3306", "port_range": null, "allowed_domains": ["127.0.0.1"], "cookie": null, "auto_login": true, "auth_login_url": "/login.php", "auth_username": "admin", "auth_password": "password", "auth_username_field": "username", "auth_password_field": "password", "auth_csrf_field": "user_token", "auth_submit_field": "Login", "auth_submit_value": "Login", "auth_success_keyword": "logout.php", "auth_extra": ["security=low"], "sync_payloads": false, "payload_sync_ref": "master", "payload_sync_max_per_category": 200, "payload_sync_timeout": 20.0, "payload_sync_incremental": false, "enable_plugins": null, "disable_plugins": null, "detection_plugin_timeout": null, "detection_plugin_max_targets": null, "plugin_timeout": null, "plugin_max_targets": ["xss_reflected=50"], "crawler_output_json": null, "report_json": "reports/dvwa-20260324-165949/risk-report.json", "report_markdown": "reports/dvwa-20260324-165949/risk-report.md", "report_html": "reports/dvwa-20260324-165949/risk-report.html", "grab_banner": false}}, "assets": {"network_summary": {"total_ports": 4, "open_ports": 1}, "web_summary": {"visited_count": 38, "urls": 38, "forms": 16, "suspicious_endpoints": 4}, "network_assets": [{"host": "127.0.0.1", "port": 80, "status": "open", "service_guess": "http", "service_version": "2.4.25", "confidence": "high", "response_time_ms": 0.464, "banner": null}, {"host": "127.0.0.1", "port": 443, "status": "closed", "service_guess": "unknown", "service_version": null, "confidence": "low", "response_time_ms": 0.364, "banner": null}, {"host": "127.0.0.1", "port": 3306, "status": "closed", "service_guess": "unknown", "service_version": null, "confidence": "low", "response_time_ms": 0.314, "banner": null}, {"host": "127.0.0.1", "port": 8080, "status": "closed", "service_guess": "unknown", "service_version": null, "confidence": "low", "response_time_ms": 0.343, "banner": null}], "web_assets": {"start_url": "http://127.0.0.1/", "max_depth": 10, "visited_count": 38, "status_code_stats": {"200": 36, "404": 2}, "redirect_chains": [["http://127.0.0.1/vulnerabilities/brute", "http://127.0.0.1/vulnerabilities/brute/"], ["http://127.0.0.1/vulnerabilities/exec", "http://127.0.0.1/vulnerabilities/exec/"], ["http://127.0.0.1/vulnerabilities/csrf", "http://127.0.0.1/vulnerabilities/csrf/"], ["http://127.0.0.1/vulnerabilities/fi?page=include.php", "http://127.0.0.1/vulnerabilities/fi/?page=include.php"], ["http://127.0.0.1/vulnerabilities/upload", "http://127.0.0.1/vulnerabilities/upload/"], ["http://127.0.0.1/vulnerabilities/captcha", "http://127.0.0.1/vulnerabilities/captcha/"], ["http://127.0.0.1/vulnerabilities/sqli", "http://127.0.0.1/vulnerabilities/sqli/"], ["http://127.0.0.1/vulnerabilities/sqli_blind", "http://127.0.0.1/vulnerabilities/sqli_blind/"], ["http://127.0.0.1/vulnerabilities/weak_id", "http://127.0.0.1/vulnerabilities/weak_id/"], ["http://127.0.0.1/vulnerabilities/xss_d", "http://127.0.0.1/vulnerabilities/xss_d/"], ["http://127.0.0.1/vulnerabilities/xss_r", "http://127.0.0.1/vulnerabilities/xss_r/"], ["http://127.0.0.1/vulnerabilities/xss_s", "http://127.0.0.1/vulnerabilities/xss_s/"], ["http://127.0.0.1/vulnerabilities/csp", "http://127.0.0.1/vulnerabilities/csp/"], ["http://127.0.0.1/vulnerabilities/javascript", "http://127.0.0.1/vulnerabilities/javascript/"], ["http://127.0.0.1/logout.php", "http://127.0.0.1/login.php"], ["http://127.0.0.1/vulnerabilities/fi?page=file1.php", "http://127.0.0.1/vulnerabilities/fi/?page=file1.php", "http://127.0.0.1/login.php"], ["http://127.0.0.1/vulnerabilities/fi?page=file2.php", "http://127.0.0.1/vulnerabilities/fi/?page=file2.php", "http://127.0.0.1/login.php"], ["http://127.0.0.1/vulnerabilities/fi?page=file3.php", "http://127.0.0.1/vulnerabilities/fi/?page=file3.php", "http://127.0.0.1/login.php"], ["http://127.0.0.1/security.php?phpids=on", "http://127.0.0.1/login.php"], ["http://127.0.0.1/security.php?test=%22%3E%3Cscript%3Eeval%28window.name%29%3C%2Fscript%3E", "http://127.0.0.1/login.php"], ["http://127.0.0.1/ids_log.php", "http://127.0.0.1/login.php"]], "urls": [{"url": "http://127.0.0.1/", "method": "GET", "params": [], "source_url": null, "depth": 0, "status_code": 200}, {"url": "http://127.0.0.1/instructions.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/setup.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/brute", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/exec", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/csrf", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/fi?page=include.php", "method": "GET", "params": ["page"], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/upload", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/captcha", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/sqli", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/sqli_blind", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/weak_id", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/xss_d", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/xss_r", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/xss_s", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/csp", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/javascript", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/security.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/phpinfo.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/about.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/logout.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/dvwa/js/dvwaPage.js", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/dvwa/js/add_event_listeners.js", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": null}, {"url": "http://127.0.0.1/instructions.php?doc=readme", "method": "GET", "params": ["doc"], "source_url": "http://127.0.0.1/instructions.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/instructions.php?doc=PDF", "method": "GET", "params": ["doc"], "source_url": "http://127.0.0.1/instructions.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/instructions.php?doc=changelog", "method": "GET", "params": ["doc"], "source_url": "http://127.0.0.1/instructions.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/instructions.php?doc=copying", "method": "GET", "params": ["doc"], "source_url": "http://127.0.0.1/instructions.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/instructions.php?doc=PHPIDS-license", "method": "GET", "params": ["doc"], "source_url": "http://127.0.0.1/instructions.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/dvwa/setup.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/instructions.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/dvwa/login.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/instructions.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/fi?page=file1.php", "method": "GET", "params": ["page"], "source_url": "http://127.0.0.1/vulnerabilities/fi?page=include.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/fi?page=file2.php", "method": "GET", "params": ["page"], "source_url": "http://127.0.0.1/vulnerabilities/fi?page=include.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/vulnerabilities/fi?page=file3.php", "method": "GET", "params": ["page"], "source_url": "http://127.0.0.1/vulnerabilities/fi?page=include.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/security.php?phpids=on", "method": "GET", "params": ["phpids"], "source_url": "http://127.0.0.1/security.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/security.php?test=%22%3E%3Cscript%3Eeval%28window.name%29%3C%2Fscript%3E", "method": "GET", "params": ["test"], "source_url": "http://127.0.0.1/security.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/ids_log.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/security.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/docs/DVWA_v1.3.pdf", "method": "GET", "params": [], "source_url": "http://127.0.0.1/about.php", "depth": 2, "status_code": null}, {"url": "http://127.0.0.1/login.php", "method": "GET", "params": [], "source_url": "http://127.0.0.1/", "depth": 1, "status_code": 200}], "forms": [{"page_url": "http://127.0.0.1/setup.php", "action": "http://127.0.0.1/setup.php", "method": "POST", "fields": [{"name": "create_db", "input_type": "submit", "required": false}, {"name": "user_token", "input_type": "hidden", "required": false}], "has_csrf_token": true, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/brute", "action": "http://127.0.0.1/vulnerabilities/brute", "method": "GET", "fields": [{"name": "username", "input_type": "text", "required": false}, {"name": "password", "input_type": "password", "required": false}, {"name": "Login", "input_type": "submit", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/exec", "action": "http://127.0.0.1/vulnerabilities/exec", "method": "POST", "fields": [{"name": "ip", "input_type": "text", "required": false}, {"name": "Submit", "input_type": "submit", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/csrf", "action": "http://127.0.0.1/vulnerabilities/csrf", "method": "GET", "fields": [{"name": "password_new", "input_type": "password", "required": false}, {"name": "password_conf", "input_type": "password", "required": false}, {"name": "Change", "input_type": "submit", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/upload", "action": "http://127.0.0.1/vulnerabilities/upload", "method": "POST", "fields": [{"name": "MAX_FILE_SIZE", "input_type": "hidden", "required": false}, {"name": "uploaded", "input_type": "file", "required": false}, {"name": "Upload", "input_type": "submit", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/captcha", "action": "http://127.0.0.1/vulnerabilities/captcha", "method": "POST", "fields": [{"name": "step", "input_type": "hidden", "required": false}, {"name": "password_new", "input_type": "password", "required": false}, {"name": "password_conf", "input_type": "password", "required": false}, {"name": "Change", "input_type": "submit", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/sqli", "action": "http://127.0.0.1/vulnerabilities/sqli", "method": "GET", "fields": [{"name": "id", "input_type": "text", "required": false}, {"name": "Submit", "input_type": "submit", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/sqli_blind", "action": "http://127.0.0.1/vulnerabilities/sqli_blind", "method": "GET", "fields": [{"name": "id", "input_type": "text", "required": false}, {"name": "Submit", "input_type": "submit", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/weak_id", "action": "http://127.0.0.1/vulnerabilities/weak_id", "method": "POST", "fields": [], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/xss_d", "action": "http://127.0.0.1/vulnerabilities/xss_d", "method": "GET", "fields": [{"name": "default", "input_type": "select", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/xss_r", "action": "http://127.0.0.1/vulnerabilities/xss_r", "method": "GET", "fields": [{"name": "name", "input_type": "text", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/xss_s", "action": "http://127.0.0.1/vulnerabilities/xss_s", "method": "POST", "fields": [{"name": "txtName", "input_type": "text", "required": false}, {"name": "mtxMessage", "input_type": "textarea", "required": false}, {"name": "btnSign", "input_type": "submit", "required": false}, {"name": "btnClear", "input_type": "submit", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/csp", "action": "http://127.0.0.1/vulnerabilities/csp", "method": "POST", "fields": [{"name": "include", "input_type": "text", "required": false}], "has_csrf_token": false, "depth": 1}, {"page_url": "http://127.0.0.1/vulnerabilities/javascript", "action": "http://127.0.0.1/vulnerabilities/javascript", "method": "POST", "fields": [{"name": "token", "input_type": "hidden", "required": false}, {"name": "phrase", "input_type": "text", "required": false}, {"name": "send", "input_type": "submit", "required": false}], "has_csrf_token": true, "depth": 1}, {"page_url": "http://127.0.0.1/security.php", "action": "http://127.0.0.1/security.php", "method": "POST", "fields": [{"name": "security", "input_type": "select", "required": false}, {"name": "seclev_submit", "input_type": "submit", "required": false}, {"name": "user_token", "input_type": "hidden", "required": false}], "has_csrf_token": true, "depth": 1}, {"page_url": "http://127.0.0.1/login.php", "action": "http://127.0.0.1/login.php", "method": "POST", "fields": [{"name": "username", "input_type": "text", "required": false}, {"name": "password", "input_type": "password", "required": false}, {"name": "Login", "input_type": "submit", "required": false}, {"name": "user_token", "input_type": "hidden", "required": false}], "has_csrf_token": true, "depth": 1}], "suspicious_endpoints": [{"url": "http://127.0.0.1/phpinfo.php", "reason": "suspicious_path", "evidence": "path contains marker: phpinfo", "depth": 1}, {"url": "http://127.0.0.1/phpinfo.php", "reason": "suspicious_response", "evidence": "response contains marker: exception", "depth": 1}, {"url": "http://127.0.0.1/instructions.php?doc=copying", "reason": "suspicious_response", "evidence": "response contains marker: exception", "depth": 2}, {"url": "http://127.0.0.1/instructions.php?doc=PHPIDS-license", "reason": "suspicious_response", "evidence": "response contains marker: exception", "depth": 2}], "errors": []}}, "vulnerabilities": {"total": 22, "by_category": {"surface-anomaly": 4, "sqli": 2, "xss": 1, "path_traversal": 2, "csrf": 6, "weak-credential": 7}, "by_severity_hint": {"medium": 9, "high": 13}, "findings": [{"id": "finding-c9320cb2a927", "plugin": "suspicious_endpoint", "category": "surface-anomaly", "title": "Suspicious endpoint discovered", "severity_hint": "medium", "confidence": 0.75, "location": {"url": "http://127.0.0.1/phpinfo.php", "method": "GET"}, "evidence": {"reason": "suspicious_path", "evidence": "path contains marker: phpinfo", "depth": 1}, "created_at": "2026-03-24T08:59:49.533894Z"}, {"id": "finding-bfa3bf67968e", "plugin": "suspicious_endpoint", "category": "surface-anomaly", "title": "Suspicious endpoint discovered", "severity_hint": "medium", "confidence": 0.75, "location": {"url": "http://127.0.0.1/phpinfo.php", "method": "GET"}, "evidence": {"reason": "suspicious_response", "evidence": "response contains marker: exception", "depth": 1}, "created_at": "2026-03-24T08:59:49.533904Z"}, {"id": "finding-ab67c9d842f1", "plugin": "suspicious_endpoint", "category": "surface-anomaly", "title": "Suspicious endpoint discovered", "severity_hint": "medium", "confidence": 0.75, "location": {"url": "http://127.0.0.1/instructions.php?doc=copying", "method": "GET"}, "evidence": {"reason": "suspicious_response", "evidence": "response contains marker: exception", "depth": 2}, "created_at": "2026-03-24T08:59:49.533910Z"}, {"id": "finding-a2572a1cc64f", "plugin": "suspicious_endpoint", "category": "surface-anomaly", "title": "Suspicious endpoint discovered", "severity_hint": "medium", "confidence": 0.75, "location": {"url": "http://127.0.0.1/instructions.php?doc=PHPIDS-license", "method": "GET"}, "evidence": {"reason": "suspicious_response", "evidence": "response contains marker: exception", "depth": 2}, "created_at": "2026-03-24T08:59:49.533915Z"}, {"id": "finding-6692e72d3d01", "plugin": "sqli_basic", "category": "sqli", "title": "SQL injection confirmed", "severity_hint": "high", "confidence": 0.9, "location": {"url": "http://127.0.0.1/instructions.php?doc=readme", "method": "GET", "param": "doc"}, "evidence": {"mode": "attack", "true_probe_url": "http://127.0.0.1/instructions.php?doc=1+%27+OR+%271%27%3D%271%27+--", "false_probe_url": "http://127.0.0.1/instructions.php?doc=1+%27+AND+%271%27%3D%272%27+--", "true_status": 200, "false_status": 200, "true_length": 15378, "false_length": 15378, "error_marker": "mysql", "boolean_diff": false, "attack_probe_url": null, "attack_status": null, "attack_feature": null, "used_payloads": {"true": "' OR '1'='1' --", "false": "' AND '1'='2' --", "attack": null}}, "created_at": "2026-03-24T08:59:49.549346Z"}, {"id": "finding-37d03daee314", "plugin": "sqli_basic", "category": "sqli", "title": "SQL injection confirmed", "severity_hint": "high", "confidence": 0.9, "location": {"url": "http://127.0.0.1/instructions.php?doc=PDF", "method": "GET", "param": "doc"}, "evidence": {"mode": "attack", "true_probe_url": "http://127.0.0.1/instructions.php?doc=1+%27+OR+%271%27%3D%271%27+--", "false_probe_url": "http://127.0.0.1/instructions.php?doc=1+%27+AND+%271%27%3D%272%27+--", "true_status": 200, "false_status": 200, "true_length": 15378, "false_length": 15378, "error_marker": "mysql", "boolean_diff": false, "attack_probe_url": null, "attack_status": null, "attack_feature": null, "used_payloads": {"true": "' OR '1'='1' --", "false": "' AND '1'='2' --", "attack": null}}, "created_at": "2026-03-24T08:59:49.549358Z"}, {"id": "finding-c82603008bdb", "plugin": "xss_reflected", "category": "xss", "title": "Reflected XSS executable payload echoed", "severity_hint": "high", "confidence": 0.92, "location": {"url": "http://127.0.0.1/vulnerabilities/xss_r", "method": "GET", "param": "name"}, "evidence": {"mode": "attack", "request_method": "GET", "probe_url": "http://127.0.0.1/vulnerabilities/xss_r?name=%3Cscript%3Econsole.log%28%27vmpxssprobe%27%29%3C%2Fscript%3E&Submit=Submit", "request_data": {"name": "<script>console.log('vmpxssprobe')<\/script>", "Submit": "Submit"}, "status": 200, "marker": "vmpxssprobe", "payload": "<script>console.log('vmpxssprobe')<\/script>", "payload_id": "xss-0019", "payload_source": "PayloadsAllTheThings@master (imported)", "contains_raw": true, "contains_escaped": false, "executable_pattern": true}, "created_at": "2026-03-24T08:59:49.641067Z"}, {"id": "finding-40fd4f16cad9", "plugin": "sensitive_path", "category": "path_traversal", "title": "Sensitive path disclosure confirmed", "severity_hint": "high", "confidence": 0.92, "location": {"url": "http://127.0.0.1/phpinfo.php", "method": "GET"}, "evidence": {"mode": "attack", "status": 200, "path": "/phpinfo.php", "attack_feature": "phpinfo", "content_preview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>\n<style type=\"text/css\">\nbody {background-color: #fff; co"}, "created_at": "2026-03-24T08:59:49.654548Z"}, {"id": "finding-97cfe2982b97", "plugin": "sensitive_path", "category": "path_traversal", "title": "Sensitive path disclosure confirmed", "severity_hint": "medium", "confidence": 0.68, "location": {"url": "http://127.0.0.1/server-status", "method": "GET"}, "evidence": {"mode": "attack", "status": 403, "path": "/server-status", "attack_feature": null, "content_preview": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>403 Forbidden<\/title>\n<\/head><body>\n<h1>Forbidden<\/h1>\n<p>You don't have permission to access /server-status\non this server.<br /"}, "created_at": "2026-03-24T08:59:49.654561Z"}, {"id": "finding-15f005212383", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "severity_hint": "high", "confidence": 0.85, "location": {"url": "http://127.0.0.1/vulnerabilities/exec", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/exec", "form_method": "POST", "fields": [{"name": "ip", "input_type": "text", "required": false}, {"name": "Submit", "input_type": "submit", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/exec", "method": "POST", "forged_post": {"ip": "ATTACK_PLACEHOLDER", "Submit": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}, "created_at": "2026-03-24T08:59:49.654964Z"}, {"id": "finding-f0e44725922f", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "severity_hint": "high", "confidence": 0.85, "location": {"url": "http://127.0.0.1/vulnerabilities/upload", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/upload", "form_method": "POST", "fields": [{"name": "MAX_FILE_SIZE", "input_type": "hidden", "required": false}, {"name": "uploaded", "input_type": "file", "required": false}, {"name": "Upload", "input_type": "submit", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/upload", "method": "POST", "forged_post": {"MAX_FILE_SIZE": "ATTACK_PLACEHOLDER", "uploaded": "ATTACK_PLACEHOLDER", "Upload": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}, "created_at": "2026-03-24T08:59:49.654976Z"}, {"id": "finding-739959934d0b", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "severity_hint": "high", "confidence": 0.85, "location": {"url": "http://127.0.0.1/vulnerabilities/captcha", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/captcha", "form_method": "POST", "fields": [{"name": "step", "input_type": "hidden", "required": false}, {"name": "password_new", "input_type": "password", "required": false}, {"name": "password_conf", "input_type": "password", "required": false}, {"name": "Change", "input_type": "submit", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/captcha", "method": "POST", "forged_post": {"step": "ATTACK_PLACEHOLDER", "password_new": "ATTACK_PLACEHOLDER", "password_conf": "ATTACK_PLACEHOLDER", "Change": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}, "created_at": "2026-03-24T08:59:49.654983Z"}, {"id": "finding-e42a8e23880f", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "severity_hint": "high", "confidence": 0.85, "location": {"url": "http://127.0.0.1/vulnerabilities/weak_id", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/weak_id", "form_method": "POST", "fields": [], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/weak_id", "method": "POST", "forged_post": {}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}, "created_at": "2026-03-24T08:59:49.654990Z"}, {"id": "finding-49ca0cda7909", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "severity_hint": "high", "confidence": 0.85, "location": {"url": "http://127.0.0.1/vulnerabilities/xss_s", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/xss_s", "form_method": "POST", "fields": [{"name": "txtName", "input_type": "text", "required": false}, {"name": "mtxMessage", "input_type": "textarea", "required": false}, {"name": "btnSign", "input_type": "submit", "required": false}, {"name": "btnClear", "input_type": "submit", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/xss_s", "method": "POST", "forged_post": {"txtName": "ATTACK_PLACEHOLDER", "mtxMessage": "ATTACK_PLACEHOLDER", "btnSign": "ATTACK_PLACEHOLDER", "btnClear": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}, "created_at": "2026-03-24T08:59:49.654996Z"}, {"id": "finding-80ff5ed8bc8a", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "severity_hint": "high", "confidence": 0.85, "location": {"url": "http://127.0.0.1/vulnerabilities/csp", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/csp", "form_method": "POST", "fields": [{"name": "include", "input_type": "text", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/csp", "method": "POST", "forged_post": {"include": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}, "created_at": "2026-03-24T08:59:49.655002Z"}, {"id": "finding-0b9f92bf33e3", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Weak password control may be insufficient", "severity_hint": "medium", "confidence": 0.6, "location": {"url": "http://127.0.0.1/vulnerabilities/brute", "method": "GET"}, "evidence": {"mode": "attack", "assessment": "login_form_without_anti_automation_hint", "field_names": ["username", "password", "Login"]}, "created_at": "2026-03-24T08:59:50.682829Z"}, {"id": "finding-dbaf9f9a8074", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Potential weak credential accepted", "severity_hint": "high", "confidence": 0.92, "location": {"url": "http://127.0.0.1/vulnerabilities/brute", "method": "POST", "param": "username"}, "evidence": {"mode": "attack", "credential": {"username": "admin", "password": "admin"}, "success_keyword": "logout", "status": 200, "rate_limited_interval_seconds": 0.5, "attempt_budget": 2}, "created_at": "2026-03-24T08:59:50.682913Z"}, {"id": "finding-331cf77312d9", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Weak password control may be insufficient", "severity_hint": "medium", "confidence": 0.6, "location": {"url": "http://127.0.0.1/vulnerabilities/csrf", "method": "GET"}, "evidence": {"mode": "attack", "assessment": "login_form_without_anti_automation_hint", "field_names": ["password_new", "password_conf", "Change"]}, "created_at": "2026-03-24T08:59:50.682945Z"}, {"id": "finding-13acb767eb2e", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Potential weak credential accepted", "severity_hint": "high", "confidence": 0.92, "location": {"url": "http://127.0.0.1/vulnerabilities/csrf", "method": "POST", "param": "username"}, "evidence": {"mode": "attack", "credential": {"username": "admin", "password": "admin"}, "success_keyword": "logout", "status": 200, "rate_limited_interval_seconds": 0.5, "attempt_budget": 2}, "created_at": "2026-03-24T08:59:50.682970Z"}, {"id": "finding-05bf6971c753", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Weak password control may be insufficient", "severity_hint": "medium", "confidence": 0.6, "location": {"url": "http://127.0.0.1/vulnerabilities/captcha", "method": "POST"}, "evidence": {"mode": "attack", "assessment": "login_form_without_anti_automation_hint", "field_names": ["step", "password_new", "password_conf", "Change"]}, "created_at": "2026-03-24T08:59:50.682994Z"}, {"id": "finding-1fec10512954", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Potential weak credential accepted", "severity_hint": "high", "confidence": 0.92, "location": {"url": "http://127.0.0.1/vulnerabilities/captcha", "method": "POST", "param": "username"}, "evidence": {"mode": "attack", "credential": {"username": "admin", "password": "admin"}, "success_keyword": "logout", "status": 200, "rate_limited_interval_seconds": 0.5, "attempt_budget": 2}, "created_at": "2026-03-24T08:59:50.683017Z"}, {"id": "finding-e9245e39828a", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Weak password control may be insufficient", "severity_hint": "medium", "confidence": 0.6, "location": {"url": "http://127.0.0.1/login.php", "method": "POST"}, "evidence": {"mode": "attack", "assessment": "login_form_without_anti_automation_hint", "field_names": ["username", "password", "Login", "user_token"]}, "created_at": "2026-03-24T08:59:50.683039Z"}]}, "risks": {"summary": {"critical": 0, "high": 4, "medium": 14, "low": 4}, "items": [{"finding_id": "finding-6692e72d3d01", "plugin": "sqli_basic", "category": "sqli", "title": "SQL injection confirmed", "score": 14.4, "level": "High", "impact": 5, "likelihood": 4, "confidence": 0.9, "exposure_weight": 0.8, "recommendation": "使用参数化查询并在服务端实施严格输入校验。", "retest": "对相同参数重复提交 SQL 注入 payload，页面不应出现错误回显或差异响应。", "location": {"url": "http://127.0.0.1/instructions.php?doc=readme", "method": "GET", "param": "doc"}, "evidence": {"mode": "attack", "true_probe_url": "http://127.0.0.1/instructions.php?doc=1+%27+OR+%271%27%3D%271%27+--", "false_probe_url": "http://127.0.0.1/instructions.php?doc=1+%27+AND+%271%27%3D%272%27+--", "true_status": 200, "false_status": 200, "true_length": 15378, "false_length": 15378, "error_marker": "mysql", "boolean_diff": false, "attack_probe_url": null, "attack_status": null, "attack_feature": null, "used_payloads": {"true": "' OR '1'='1' --", "false": "' AND '1'='2' --", "attack": null}}}, {"finding_id": "finding-37d03daee314", "plugin": "sqli_basic", "category": "sqli", "title": "SQL injection confirmed", "score": 14.4, "level": "High", "impact": 5, "likelihood": 4, "confidence": 0.9, "exposure_weight": 0.8, "recommendation": "使用参数化查询并在服务端实施严格输入校验。", "retest": "对相同参数重复提交 SQL 注入 payload，页面不应出现错误回显或差异响应。", "location": {"url": "http://127.0.0.1/instructions.php?doc=PDF", "method": "GET", "param": "doc"}, "evidence": {"mode": "attack", "true_probe_url": "http://127.0.0.1/instructions.php?doc=1+%27+OR+%271%27%3D%271%27+--", "false_probe_url": "http://127.0.0.1/instructions.php?doc=1+%27+AND+%271%27%3D%272%27+--", "true_status": 200, "false_status": 200, "true_length": 15378, "false_length": 15378, "error_marker": "mysql", "boolean_diff": false, "attack_probe_url": null, "attack_status": null, "attack_feature": null, "used_payloads": {"true": "' OR '1'='1' --", "false": "' AND '1'='2' --", "attack": null}}}, {"finding_id": "finding-c82603008bdb", "plugin": "xss_reflected", "category": "xss", "title": "Reflected XSS executable payload echoed", "score": 11.78, "level": "High", "impact": 4, "likelihood": 4, "confidence": 0.92, "exposure_weight": 0.8, "recommendation": "对输出进行上下文感知编码，并配置 CSP 限制脚本执行。", "retest": "提交相同 XSS payload，页面应只显示转义文本且脚本不执行。", "location": {"url": "http://127.0.0.1/vulnerabilities/xss_r", "method": "GET", "param": "name"}, "evidence": {"mode": "attack", "request_method": "GET", "probe_url": "http://127.0.0.1/vulnerabilities/xss_r?name=%3Cscript%3Econsole.log%28%27vmpxssprobe%27%29%3C%2Fscript%3E&Submit=Submit", "request_data": {"name": "<script>console.log('vmpxssprobe')<\/script>", "Submit": "Submit"}, "status": 200, "marker": "vmpxssprobe", "payload": "<script>console.log('vmpxssprobe')<\/script>", "payload_id": "xss-0019", "payload_source": "PayloadsAllTheThings@master (imported)", "contains_raw": true, "contains_escaped": false, "executable_pattern": true}}, {"finding_id": "finding-40fd4f16cad9", "plugin": "sensitive_path", "category": "path_traversal", "title": "Sensitive path disclosure confirmed", "score": 11.78, "level": "High", "impact": 4, "likelihood": 4, "confidence": 0.92, "exposure_weight": 0.8, "recommendation": "限制可访问路径并在服务端做目录白名单校验。", "retest": "访问同路径字典项时应返回 403 或 404，不应泄露敏感资源。", "location": {"url": "http://127.0.0.1/phpinfo.php", "method": "GET"}, "evidence": {"mode": "attack", "status": 200, "path": "/phpinfo.php", "attack_feature": "phpinfo", "content_preview": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>\n<style type=\"text/css\">\nbody {background-color: #fff; co"}}, {"finding_id": "finding-dbaf9f9a8074", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Potential weak credential accepted", "score": 8.83, "level": "Medium", "impact": 4, "likelihood": 3, "confidence": 0.92, "exposure_weight": 0.8, "recommendation": "启用强密码策略、登录限速与失败锁定机制。", "retest": "使用弱口令凭据重复登录尝试，应触发失败告警或锁定策略。", "location": {"url": "http://127.0.0.1/vulnerabilities/brute", "method": "POST", "param": "username"}, "evidence": {"mode": "attack", "credential": {"username": "admin", "password": "admin"}, "success_keyword": "logout", "status": 200, "rate_limited_interval_seconds": 0.5, "attempt_budget": 2}}, {"finding_id": "finding-13acb767eb2e", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Potential weak credential accepted", "score": 8.83, "level": "Medium", "impact": 4, "likelihood": 3, "confidence": 0.92, "exposure_weight": 0.8, "recommendation": "启用强密码策略、登录限速与失败锁定机制。", "retest": "使用弱口令凭据重复登录尝试，应触发失败告警或锁定策略。", "location": {"url": "http://127.0.0.1/vulnerabilities/csrf", "method": "POST", "param": "username"}, "evidence": {"mode": "attack", "credential": {"username": "admin", "password": "admin"}, "success_keyword": "logout", "status": 200, "rate_limited_interval_seconds": 0.5, "attempt_budget": 2}}, {"finding_id": "finding-1fec10512954", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Potential weak credential accepted", "score": 8.83, "level": "Medium", "impact": 4, "likelihood": 3, "confidence": 0.92, "exposure_weight": 0.8, "recommendation": "启用强密码策略、登录限速与失败锁定机制。", "retest": "使用弱口令凭据重复登录尝试，应触发失败告警或锁定策略。", "location": {"url": "http://127.0.0.1/vulnerabilities/captcha", "method": "POST", "param": "username"}, "evidence": {"mode": "attack", "credential": {"username": "admin", "password": "admin"}, "success_keyword": "logout", "status": 200, "rate_limited_interval_seconds": 0.5, "attempt_budget": 2}}, {"finding_id": "finding-97cfe2982b97", "plugin": "sensitive_path", "category": "path_traversal", "title": "Sensitive path disclosure confirmed", "score": 8.7, "level": "Medium", "impact": 4, "likelihood": 4, "confidence": 0.68, "exposure_weight": 0.8, "recommendation": "限制可访问路径并在服务端做目录白名单校验。", "retest": "访问同路径字典项时应返回 403 或 404，不应泄露敏感资源。", "location": {"url": "http://127.0.0.1/server-status", "method": "GET"}, "evidence": {"mode": "attack", "status": 403, "path": "/server-status", "attack_feature": null, "content_preview": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>403 Forbidden<\/title>\n<\/head><body>\n<h1>Forbidden<\/h1>\n<p>You don't have permission to access /server-status\non this server.<br /"}}, {"finding_id": "finding-15f005212383", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "score": 6.12, "level": "Medium", "impact": 3, "likelihood": 3, "confidence": 0.85, "exposure_weight": 0.8, "recommendation": "为关键操作加入一次性 CSRF Token，并校验来源与会话绑定。", "retest": "在缺失或伪造 Token 情况下重复提交请求，应被服务端拒绝。", "location": {"url": "http://127.0.0.1/vulnerabilities/exec", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/exec", "form_method": "POST", "fields": [{"name": "ip", "input_type": "text", "required": false}, {"name": "Submit", "input_type": "submit", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/exec", "method": "POST", "forged_post": {"ip": "ATTACK_PLACEHOLDER", "Submit": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}}, {"finding_id": "finding-f0e44725922f", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "score": 6.12, "level": "Medium", "impact": 3, "likelihood": 3, "confidence": 0.85, "exposure_weight": 0.8, "recommendation": "为关键操作加入一次性 CSRF Token，并校验来源与会话绑定。", "retest": "在缺失或伪造 Token 情况下重复提交请求，应被服务端拒绝。", "location": {"url": "http://127.0.0.1/vulnerabilities/upload", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/upload", "form_method": "POST", "fields": [{"name": "MAX_FILE_SIZE", "input_type": "hidden", "required": false}, {"name": "uploaded", "input_type": "file", "required": false}, {"name": "Upload", "input_type": "submit", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/upload", "method": "POST", "forged_post": {"MAX_FILE_SIZE": "ATTACK_PLACEHOLDER", "uploaded": "ATTACK_PLACEHOLDER", "Upload": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}}, {"finding_id": "finding-739959934d0b", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "score": 6.12, "level": "Medium", "impact": 3, "likelihood": 3, "confidence": 0.85, "exposure_weight": 0.8, "recommendation": "为关键操作加入一次性 CSRF Token，并校验来源与会话绑定。", "retest": "在缺失或伪造 Token 情况下重复提交请求，应被服务端拒绝。", "location": {"url": "http://127.0.0.1/vulnerabilities/captcha", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/captcha", "form_method": "POST", "fields": [{"name": "step", "input_type": "hidden", "required": false}, {"name": "password_new", "input_type": "password", "required": false}, {"name": "password_conf", "input_type": "password", "required": false}, {"name": "Change", "input_type": "submit", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/captcha", "method": "POST", "forged_post": {"step": "ATTACK_PLACEHOLDER", "password_new": "ATTACK_PLACEHOLDER", "password_conf": "ATTACK_PLACEHOLDER", "Change": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}}, {"finding_id": "finding-e42a8e23880f", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "score": 6.12, "level": "Medium", "impact": 3, "likelihood": 3, "confidence": 0.85, "exposure_weight": 0.8, "recommendation": "为关键操作加入一次性 CSRF Token，并校验来源与会话绑定。", "retest": "在缺失或伪造 Token 情况下重复提交请求，应被服务端拒绝。", "location": {"url": "http://127.0.0.1/vulnerabilities/weak_id", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/weak_id", "form_method": "POST", "fields": [], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/weak_id", "method": "POST", "forged_post": {}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}}, {"finding_id": "finding-49ca0cda7909", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "score": 6.12, "level": "Medium", "impact": 3, "likelihood": 3, "confidence": 0.85, "exposure_weight": 0.8, "recommendation": "为关键操作加入一次性 CSRF Token，并校验来源与会话绑定。", "retest": "在缺失或伪造 Token 情况下重复提交请求，应被服务端拒绝。", "location": {"url": "http://127.0.0.1/vulnerabilities/xss_s", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/xss_s", "form_method": "POST", "fields": [{"name": "txtName", "input_type": "text", "required": false}, {"name": "mtxMessage", "input_type": "textarea", "required": false}, {"name": "btnSign", "input_type": "submit", "required": false}, {"name": "btnClear", "input_type": "submit", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/xss_s", "method": "POST", "forged_post": {"txtName": "ATTACK_PLACEHOLDER", "mtxMessage": "ATTACK_PLACEHOLDER", "btnSign": "ATTACK_PLACEHOLDER", "btnClear": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}}, {"finding_id": "finding-80ff5ed8bc8a", "plugin": "csrf_missing_token", "category": "csrf", "title": "CSRF attack may be forgeable", "score": 6.12, "level": "Medium", "impact": 3, "likelihood": 3, "confidence": 0.85, "exposure_weight": 0.8, "recommendation": "为关键操作加入一次性 CSRF Token，并校验来源与会话绑定。", "retest": "在缺失或伪造 Token 情况下重复提交请求，应被服务端拒绝。", "location": {"url": "http://127.0.0.1/vulnerabilities/csp", "method": "POST", "param": "csrf_token"}, "evidence": {"mode": "attack", "form_action": "http://127.0.0.1/vulnerabilities/csp", "form_method": "POST", "fields": [{"name": "include", "input_type": "text", "required": false}], "has_csrf_token": false, "payload_ids": ["csrf-101"], "payload_samples": ["cross_site_auto_submit"], "attack_poc": {"target": "http://127.0.0.1/vulnerabilities/csp", "method": "POST", "forged_post": {"include": "ATTACK_PLACEHOLDER"}, "payload_samples": ["cross_site_auto_submit"], "payload_ids": ["csrf-101"]}}}, {"finding_id": "finding-0b9f92bf33e3", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Weak password control may be insufficient", "score": 5.76, "level": "Medium", "impact": 4, "likelihood": 3, "confidence": 0.6, "exposure_weight": 0.8, "recommendation": "启用强密码策略、登录限速与失败锁定机制。", "retest": "使用弱口令凭据重复登录尝试，应触发失败告警或锁定策略。", "location": {"url": "http://127.0.0.1/vulnerabilities/brute", "method": "GET"}, "evidence": {"mode": "attack", "assessment": "login_form_without_anti_automation_hint", "field_names": ["username", "password", "Login"]}}, {"finding_id": "finding-331cf77312d9", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Weak password control may be insufficient", "score": 5.76, "level": "Medium", "impact": 4, "likelihood": 3, "confidence": 0.6, "exposure_weight": 0.8, "recommendation": "启用强密码策略、登录限速与失败锁定机制。", "retest": "使用弱口令凭据重复登录尝试，应触发失败告警或锁定策略。", "location": {"url": "http://127.0.0.1/vulnerabilities/csrf", "method": "GET"}, "evidence": {"mode": "attack", "assessment": "login_form_without_anti_automation_hint", "field_names": ["password_new", "password_conf", "Change"]}}, {"finding_id": "finding-05bf6971c753", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Weak password control may be insufficient", "score": 5.76, "level": "Medium", "impact": 4, "likelihood": 3, "confidence": 0.6, "exposure_weight": 0.8, "recommendation": "启用强密码策略、登录限速与失败锁定机制。", "retest": "使用弱口令凭据重复登录尝试，应触发失败告警或锁定策略。", "location": {"url": "http://127.0.0.1/vulnerabilities/captcha", "method": "POST"}, "evidence": {"mode": "attack", "assessment": "login_form_without_anti_automation_hint", "field_names": ["step", "password_new", "password_conf", "Change"]}}, {"finding_id": "finding-e9245e39828a", "plugin": "weak_password_policy", "category": "weak-credential", "title": "Weak password control may be insufficient", "score": 5.76, "level": "Medium", "impact": 4, "likelihood": 3, "confidence": 0.6, "exposure_weight": 0.8, "recommendation": "启用强密码策略、登录限速与失败锁定机制。", "retest": "使用弱口令凭据重复登录尝试，应触发失败告警或锁定策略。", "location": {"url": "http://127.0.0.1/login.php", "method": "POST"}, "evidence": {"mode": "attack", "assessment": "login_form_without_anti_automation_hint", "field_names": ["username", "password", "Login", "user_token"]}}, {"finding_id": "finding-c9320cb2a927", "plugin": "suspicious_endpoint", "category": "surface-anomaly", "title": "Suspicious endpoint discovered", "score": 2.4, "level": "Low", "impact": 2, "likelihood": 2, "confidence": 0.75, "exposure_weight": 0.8, "recommendation": "收敛对外暴露接口并为异常端点添加访问控制。", "retest": "再次扫描异常端点时不应返回高价值信息或管理入口内容。", "location": {"url": "http://127.0.0.1/phpinfo.php", "method": "GET"}, "evidence": {"reason": "suspicious_path", "evidence": "path contains marker: phpinfo", "depth": 1}}, {"finding_id": "finding-bfa3bf67968e", "plugin": "suspicious_endpoint", "category": "surface-anomaly", "title": "Suspicious endpoint discovered", "score": 2.4, "level": "Low", "impact": 2, "likelihood": 2, "confidence": 0.75, "exposure_weight": 0.8, "recommendation": "收敛对外暴露接口并为异常端点添加访问控制。", "retest": "再次扫描异常端点时不应返回高价值信息或管理入口内容。", "location": {"url": "http://127.0.0.1/phpinfo.php", "method": "GET"}, "evidence": {"reason": "suspicious_response", "evidence": "response contains marker: exception", "depth": 1}}, {"finding_id": "finding-ab67c9d842f1", "plugin": "suspicious_endpoint", "category": "surface-anomaly", "title": "Suspicious endpoint discovered", "score": 2.4, "level": "Low", "impact": 2, "likelihood": 2, "confidence": 0.75, "exposure_weight": 0.8, "recommendation": "收敛对外暴露接口并为异常端点添加访问控制。", "retest": "再次扫描异常端点时不应返回高价值信息或管理入口内容。", "location": {"url": "http://127.0.0.1/instructions.php?doc=copying", "method": "GET"}, "evidence": {"reason": "suspicious_response", "evidence": "response contains marker: exception", "depth": 2}}, {"finding_id": "finding-a2572a1cc64f", "plugin": "suspicious_endpoint", "category": "surface-anomaly", "title": "Suspicious endpoint discovered", "score": 2.4, "level": "Low", "impact": 2, "likelihood": 2, "confidence": 0.75, "exposure_weight": 0.8, "recommendation": "收敛对外暴露接口并为异常端点添加访问控制。", "retest": "再次扫描异常端点时不应返回高价值信息或管理入口内容。", "location": {"url": "http://127.0.0.1/instructions.php?doc=PHPIDS-license", "method": "GET"}, "evidence": {"reason": "suspicious_response", "evidence": "response contains marker: exception", "depth": 2}}]}, "recommendations": [{"category": "weak-credential", "recommendation": "启用强密码策略、登录限速与失败锁定机制。", "retest": "使用弱口令凭据重复登录尝试，应触发失败告警或锁定策略。", "count": 7}, {"category": "csrf", "recommendation": "为关键操作加入一次性 CSRF Token，并校验来源与会话绑定。", "retest": "在缺失或伪造 Token 情况下重复提交请求，应被服务端拒绝。", "count": 6}, {"category": "surface-anomaly", "recommendation": "收敛对外暴露接口并为异常端点添加访问控制。", "retest": "再次扫描异常端点时不应返回高价值信息或管理入口内容。", "count": 4}, {"category": "sqli", "recommendation": "使用参数化查询并在服务端实施严格输入校验。", "retest": "对相同参数重复提交 SQL 注入 payload，页面不应出现错误回显或差异响应。", "count": 2}, {"category": "path_traversal", "recommendation": "限制可访问路径并在服务端做目录白名单校验。", "retest": "访问同路径字典项时应返回 403 或 404，不应泄露敏感资源。", "count": 2}, {"category": "xss", "recommendation": "对输出进行上下文感知编码，并配置 CSP 限制脚本执行。", "retest": "提交相同 XSS payload，页面应只显示转义文本且脚本不执行。", "count": 1}], "errors": {"collection": [], "detection": [], "assessment": []}}</script>
+  <script>
+    const report = JSON.parse(document.getElementById('report-data').textContent);
+    const allItems = Array.isArray(report?.risks?.items) ? report.risks.items : [];
+
+    const riskBody = document.getElementById('riskBody');
+    const rowCounter = document.getElementById('rowCounter');
+    const metricFindings = document.getElementById('metric-findings');
+    const metricRisks = document.getElementById('metric-risks');
+    const ring = document.getElementById('ring');
+    const ringTotal = document.getElementById('ringTotal');
+    const legend = document.getElementById('legend');
+    const drawer = document.getElementById('drawer');
+
+    const searchInput = document.getElementById('searchInput');
+    const levelSelect = document.getElementById('levelSelect');
+    const categorySelect = document.getElementById('categorySelect');
+    const pluginSelect = document.getElementById('pluginSelect');
+    const assetSelect = document.getElementById('assetSelect');
+    const statusMinInput = document.getElementById('statusMinInput');
+    const statusMaxInput = document.getElementById('statusMaxInput');
+    const recommendationList = document.getElementById('recommendationList');
+    const recCounter = document.getElementById('recCounter');
+    const metricCards = Array.from(document.querySelectorAll('.metric-card'));
+
+    const webUrls = Array.isArray(report?.assets?.web_assets?.urls) ? report.assets.web_assets.urls : [];
+    const urlStatusMap = new Map();
+
+    function normalizeUrl(url) {
+      return String(url || '').trim().replace(/\/+$/, '').toLowerCase();
+    }
+
+    for (const entry of webUrls) {
+      const raw = String(entry?.url || '').trim();
+      const key = normalizeUrl(raw);
+      const code = Number(entry?.status_code);
+      if (!key || Number.isNaN(code)) continue;
+      urlStatusMap.set(key, code);
+      urlStatusMap.set(raw.toLowerCase(), code);
+    }
+
+    function uniqueValues(key) {
+      return [...new Set(allItems.map(item => String(item?.[key] || '').trim()).filter(Boolean))].sort();
+    }
+
+    function fillSelect(select, values) {
+      for (const value of values) {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = value;
+        select.appendChild(option);
+      }
+    }
+
+    fillSelect(categorySelect, uniqueValues('category'));
+    fillSelect(pluginSelect, uniqueValues('plugin'));
+
+    function uniqueHosts() {
+      const hosts = new Set();
+      for (const item of allItems) {
+        const url = String(item?.location?.url || '');
+        if (!url) continue;
+        try {
+          hosts.add(new URL(url).host);
+        } catch (_err) {
+          continue;
+        }
+      }
+      return [...hosts].sort();
+    }
+
+    fillSelect(assetSelect, uniqueHosts());
+
+    function normalizedLevel(level) {
+      return String(level || 'low').toLowerCase();
+    }
+
+    function levelLabel(level) {
+      const key = String(level || 'Low');
+      if (key === 'Critical') return '严重';
+      if (key === 'High') return '高危';
+      if (key === 'Medium') return '中危';
+      if (key === 'Low') return '低危';
+      return key;
+    }
+
+    function itemText(item) {
+      const url = String(item?.location?.url || '');
+      const param = String(item?.location?.param || '');
+      return [item?.title, item?.category, item?.plugin, url, param].join(' ').toLowerCase();
+    }
+
+    function getStatusCode(item) {
+      const url = String(item?.location?.url || '');
+      if (!url) return null;
+      const normalized = normalizeUrl(url);
+      if (urlStatusMap.has(normalized)) return urlStatusMap.get(normalized);
+      if (urlStatusMap.has(url.toLowerCase())) return urlStatusMap.get(url.toLowerCase());
+      return null;
+    }
+
+    function getHost(item) {
+      const url = String(item?.location?.url || '');
+      if (!url) return '';
+      try {
+        return new URL(url).host;
+      } catch (_err) {
+        return '';
+      }
+    }
+
+    function getFilteredItems() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const level = levelSelect.value;
+      const category = categorySelect.value;
+      const plugin = pluginSelect.value;
+      const asset = assetSelect.value;
+      const statusMin = Number(statusMinInput.value);
+      const statusMax = Number(statusMaxInput.value);
+      const hasStatusMin = !Number.isNaN(statusMin);
+      const hasStatusMax = !Number.isNaN(statusMax);
+
+      return allItems
+        .filter(item => !keyword || itemText(item).includes(keyword))
+        .filter(item => !level || item.level === level)
+        .filter(item => !category || item.category === category)
+        .filter(item => !plugin || item.plugin === plugin)
+        .filter(item => !asset || getHost(item) === asset)
+        .filter(item => {
+          if (!hasStatusMin && !hasStatusMax) return true;
+          const status = getStatusCode(item);
+          if (status === null) return false;
+          if (hasStatusMin && status < statusMin) return false;
+          if (hasStatusMax && status > statusMax) return false;
+          return true;
+        })
+        .sort((a, b) => Number(b.score || 0) - Number(a.score || 0));
+    }
+
+    function showDetail(item) {
+      document.getElementById('detailTitle').textContent = item?.title || '风险详情';
+      document.getElementById('detailMeta').textContent = `${levelLabel(item?.level || '-') } · ${item?.category || '-'} · 分数=${Number(item?.score || 0).toFixed(2)}`;
+      document.getElementById('detailRecommendation').textContent = item?.recommendation || '-';
+      document.getElementById('detailRetest').textContent = item?.retest || '-';
+      document.getElementById('detailEvidence').textContent = JSON.stringify(item?.evidence || {}, null, 2);
+      drawer.classList.add('open');
+    }
+
+    function renderTable(items) {
+      riskBody.innerHTML = '';
+      for (const item of items) {
+        const row = document.createElement('tr');
+        const url = String(item?.location?.url || '-');
+        const status = getStatusCode(item);
+        row.innerHTML = `
+          <td><span class="badge ${normalizedLevel(item.level)}">${levelLabel(item.level || 'Low')}</span></td>
+          <td>${Number(item.score || 0).toFixed(2)}</td>
+          <td>${item.category || '-'}</td>
+          <td>${item.plugin || '-'}</td>
+          <td>${status === null ? '-' : status}</td>
+          <td>${item.title || '-'}</td>
+          <td title="${url}">${url.length > 54 ? url.slice(0, 51) + '...' : url}</td>
+        `;
+        row.addEventListener('click', () => showDetail(item));
+        riskBody.appendChild(row);
+      }
+      rowCounter.textContent = `${items.length} 条`;
+      metricFindings.textContent = String(items.length);
+      metricRisks.textContent = String(items.length);
+    }
+
+    function renderRecommendations(items) {
+      const grouped = new Map();
+      for (const item of items) {
+        const category = String(item?.category || 'unknown');
+        const recommendation = String(item?.recommendation || '-');
+        const retest = String(item?.retest || '-');
+        const key = `${category}||${recommendation}||${retest}`;
+        const count = grouped.get(key)?.count || 0;
+        grouped.set(key, { category, recommendation, retest, count: count + 1 });
+      }
+
+      const rows = Array.from(grouped.values()).sort((a, b) => b.count - a.count);
+      recommendationList.innerHTML = '';
+      recCounter.textContent = `${rows.length} 组`;
+
+      for (const row of rows) {
+        const item = document.createElement('details');
+        item.className = 'rec-item';
+        item.innerHTML = `
+          <summary><span>${row.category}</span><strong>${row.count} 条</strong></summary>
+          <div class="rec-body">
+            <div><strong>修复建议：</strong>${row.recommendation}</div>
+            <div style="margin-top:8px;"><strong>复测建议：</strong>${row.retest}</div>
+          </div>
+        `;
+        recommendationList.appendChild(item);
+      }
+    }
+
+    function renderRing(items) {
+      const counts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+      for (const item of items) {
+        const level = String(item?.level || 'Low');
+        if (counts[level] !== undefined) counts[level] += 1;
+      }
+      const total = items.length || 1;
+      const c = counts.Critical / total * 360;
+      const h = c + counts.High / total * 360;
+      const m = h + counts.Medium / total * 360;
+
+      ring.style.background = `conic-gradient(var(--critical) 0deg ${c}deg, var(--high) ${c}deg ${h}deg, var(--medium) ${h}deg ${m}deg, var(--low) ${m}deg 360deg)`;
+      ringTotal.textContent = String(items.length);
+      legend.innerHTML = `
+        <div><span><span class="dot" style="background:var(--critical)"></span>严重</span><strong>${counts.Critical}</strong></div>
+        <div><span><span class="dot" style="background:var(--high)"></span>高危</span><strong>${counts.High}</strong></div>
+        <div><span><span class="dot" style="background:var(--medium)"></span>中危</span><strong>${counts.Medium}</strong></div>
+        <div><span><span class="dot" style="background:var(--low)"></span>低危</span><strong>${counts.Low}</strong></div>
+      `;
+    }
+
+    function renderAll() {
+      const items = getFilteredItems();
+      renderTable(items);
+      renderRing(items);
+      renderRecommendations(items);
+      syncMetricCardState();
+    }
+
+    function syncMetricCardState() {
+      for (const card of metricCards) {
+        const cardLevel = String(card.dataset.level || '');
+        const active = cardLevel && levelSelect.value === cardLevel;
+        card.classList.toggle('active', active);
+      }
+    }
+
+    [searchInput, levelSelect, categorySelect, pluginSelect, assetSelect, statusMinInput, statusMaxInput].forEach(el => {
+      el.addEventListener('input', renderAll);
+      el.addEventListener('change', renderAll);
+    });
+
+    for (const card of metricCards) {
+      card.addEventListener('click', () => {
+        const cardLevel = String(card.dataset.level || '');
+        if (!cardLevel) {
+          levelSelect.value = '';
+          renderAll();
+          return;
+        }
+        levelSelect.value = levelSelect.value === cardLevel ? '' : cardLevel;
+        renderAll();
+        document.getElementById('risk-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+
+    document.getElementById('closeDrawer').addEventListener('click', () => drawer.classList.remove('open'));
+    document.getElementById('backToTopBtn').addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    document.getElementById('expandAllRecsBtn').addEventListener('click', () => {
+      recommendationList.querySelectorAll('details').forEach(node => node.open = true);
+    });
+    document.getElementById('collapseAllRecsBtn').addEventListener('click', () => {
+      recommendationList.querySelectorAll('details').forEach(node => node.open = false);
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const items = getFilteredItems();
+      const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = '筛选后的风险条目.json';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
