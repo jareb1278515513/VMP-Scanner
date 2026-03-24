@@ -64,6 +64,8 @@ FALLBACK_RECOMMENDATION = (
 
 @dataclass
 class _ScoringContext:
+    """评分上下文数据。"""
+
     impact: int
     likelihood: int
     confidence: float
@@ -71,9 +73,23 @@ class _ScoringContext:
 
 
 class AssessmentService:
+    """风险评估服务。
+
+    将检测发现转换为可排序的风险项并生成统计摘要。
+    """
+
     schema_version = "1.0"
 
     def assess(self, request: AssessmentRequest | dict) -> dict:
+        """执行风险评估。
+
+        Args:
+            request: 评估请求对象或等价字典。
+
+        Returns:
+            dict: 风险评估结果（risk bundle）。
+        """
+
         normalized = _coerce_request(request)
         finding_bundle = normalized.findings
 
@@ -101,6 +117,18 @@ class AssessmentService:
 
 
 def _coerce_request(request: AssessmentRequest | dict) -> AssessmentRequest:
+    """将输入转换为 ``AssessmentRequest``。
+
+    Args:
+        request: 原始请求。
+
+    Returns:
+        AssessmentRequest: 标准化请求对象。
+
+    Raises:
+        ValueError: 输入类型不合法或缺失必要字段时抛出。
+    """
+
     if isinstance(request, AssessmentRequest):
         return request
 
@@ -122,6 +150,8 @@ def _coerce_request(request: AssessmentRequest | dict) -> AssessmentRequest:
 
 
 def _normalize_weights(weights: dict) -> dict[str, float]:
+    """归一化权重配置。"""
+
     normalized: dict[str, float] = dict(DEFAULT_WEIGHTS)
     for key in DEFAULT_WEIGHTS:
         if key in weights:
@@ -130,6 +160,8 @@ def _normalize_weights(weights: dict) -> dict[str, float]:
 
 
 def _build_risk_item(finding: dict, weights: dict[str, float]) -> RiskItem:
+    """将单条发现转换为风险项。"""
+
     if not isinstance(finding, dict):
         raise ValueError("finding item must be a dict")
 
@@ -170,6 +202,8 @@ def _build_risk_item(finding: dict, weights: dict[str, float]) -> RiskItem:
 
 
 def _resolve_impact_likelihood(category: str, severity_hint: str) -> tuple[int, int]:
+    """根据类别或严重度提示解析影响与可能性。"""
+
     base = CATEGORY_BASELINE.get(category)
     if base is not None:
         return base
@@ -177,6 +211,8 @@ def _resolve_impact_likelihood(category: str, severity_hint: str) -> tuple[int, 
 
 
 def _derive_exposure_weight(location: dict) -> float:
+    """根据位置上下文估算暴露权重。"""
+
     url = str(location.get("url", "")).lower()
     param = str(location.get("param", "")).lower()
 
@@ -192,6 +228,8 @@ def _derive_exposure_weight(location: dict) -> float:
 
 
 def _calculate_score(scoring: _ScoringContext, weights: dict[str, float]) -> float:
+    """计算综合风险分数。"""
+
     score = (
         scoring.impact * weights["impact"]
         * scoring.likelihood * weights["likelihood"]
@@ -202,6 +240,8 @@ def _calculate_score(scoring: _ScoringContext, weights: dict[str, float]) -> flo
 
 
 def _resolve_level(score: float) -> str:
+    """根据分值映射风险等级。"""
+
     if score >= 16:
         return "Critical"
     if score >= 10:
@@ -212,6 +252,8 @@ def _resolve_level(score: float) -> str:
 
 
 def _build_summary(items: list[RiskItem]) -> dict:
+    """聚合风险等级统计。"""
+
     summary = {"critical": 0, "high": 0, "medium": 0, "low": 0}
     for item in items:
         summary[item.level.lower()] += 1
@@ -219,6 +261,8 @@ def _build_summary(items: list[RiskItem]) -> dict:
 
 
 def _clamp_float(value: object, low: float, high: float) -> float:
+    """将浮点值限制在给定区间内。"""
+
     parsed = float(value)
     if parsed < low:
         return low

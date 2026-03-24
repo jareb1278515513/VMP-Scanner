@@ -8,7 +8,11 @@ from scanner.detection.base import DetectionPlugin
 
 
 class WeakPasswordPolicyPlugin(DetectionPlugin):
+    """检测弱口令与防自动化策略不足的插件。"""
+
     def metadata(self) -> dict:
+        """返回插件元数据。"""
+
         return {
             "name": "weak_password_policy",
             "category": "weak-credential",
@@ -18,11 +22,15 @@ class WeakPasswordPolicyPlugin(DetectionPlugin):
         }
 
     def match(self, collection_bundle: dict, mode: str) -> bool:
+        """判断采集结果中是否存在登录表单。"""
+
         web_assets = collection_bundle.get("web_assets") or {}
         forms = web_assets.get("forms") or []
         return any(_is_login_form(form) for form in forms)
 
     def probe(self, collection_bundle: dict, mode: str) -> list[dict]:
+        """生成弱口令策略候选发现。"""
+
         web_assets = collection_bundle.get("web_assets") or {}
         forms = web_assets.get("forms") or []
         metadata = collection_bundle.get("metadata") or {}
@@ -126,20 +134,28 @@ class WeakPasswordPolicyPlugin(DetectionPlugin):
         return findings
 
     def verify(self, candidate: dict, collection_bundle: dict) -> bool:
+        """校验候选项基础有效性。"""
+
         location = candidate.get("location") or {}
         return bool(location.get("url"))
 
     def evidence(self, candidate: dict) -> dict:
+        """提取候选项证据。"""
+
         return dict(candidate.get("raw") or {})
 
 
 def _is_login_form(form: dict) -> bool:
+    """判断表单是否疑似登录表单。"""
+
     fields = form.get("fields") or []
     names = [str(item.get("name") or "").lower() for item in fields]
     return any("pass" in name for name in names)
 
 
 def _find_field_name(field_names: list[str], keywords: tuple[str, ...], fallback: str) -> str:
+    """按关键字匹配字段名，匹配失败时返回回退值。"""
+
     for name in field_names:
         lowered = name.lower()
         if any(keyword in lowered for keyword in keywords):
@@ -148,6 +164,8 @@ def _find_field_name(field_names: list[str], keywords: tuple[str, ...], fallback
 
 
 def _apply_session_cookies(session: requests.Session, collection_bundle: dict) -> None:
+    """将采集层会话 Cookie 注入请求会话。"""
+
     metadata = collection_bundle.get("metadata") or {}
     cookies = metadata.get("session_cookies") or {}
     if isinstance(cookies, dict) and cookies:

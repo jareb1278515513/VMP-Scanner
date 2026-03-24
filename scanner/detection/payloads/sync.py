@@ -47,6 +47,21 @@ def sync_from_open_source(
     incremental: bool = False,
     fetcher: Callable[[str, float], str] | None = None,
 ) -> dict[str, int]:
+    """从开源仓库同步 payload 字典。
+
+    Args:
+        base_dir: 本地 payload 目录。
+        sources: 分类到来源 URL 的映射。
+        repo_ref: 上游仓库分支/标签/提交。
+        timeout: 下载超时（秒）。
+        max_per_category: 每类最多导入数量。
+        incremental: 是否增量合并到现有字典。
+        fetcher: 可注入下载函数（便于测试）。
+
+    Returns:
+        dict[str, int]: 各分类导入条目数。
+    """
+
     payload_dir = Path(base_dir)
     payload_dir.mkdir(parents=True, exist_ok=True)
 
@@ -90,6 +105,8 @@ def sync_from_open_source(
 
 
 def _build_default_sources(repo_ref: str) -> dict[str, list[str]]:
+    """构建默认上游来源列表。"""
+
     return {
         category: [template.format(ref=repo_ref) for template in templates]
         for category, templates in CATEGORY_SOURCE_TEMPLATES.items()
@@ -97,12 +114,16 @@ def _build_default_sources(repo_ref: str) -> dict[str, list[str]]:
 
 
 def _fetch_text(url: str, timeout: float) -> str:
+    """下载文本内容。"""
+
     response = requests.get(url, timeout=timeout)
     response.raise_for_status()
     return response.text
 
 
 def _extract_payload_candidates(markdown_text: str) -> list[str]:
+    """从 Markdown 中提取 payload 候选。"""
+
     payloads: list[str] = []
 
     fenced_blocks = re.findall(r"```(?:[a-zA-Z0-9_+-]+)?\n(.*?)```", markdown_text, flags=re.DOTALL)
@@ -131,6 +152,8 @@ def _extract_payload_candidates(markdown_text: str) -> list[str]:
 
 
 def _clean_candidate(raw: str) -> str | None:
+    """清洗并过滤无效 payload 候选。"""
+
     text = raw.strip().strip("`")
     if not text:
         return None
@@ -144,6 +167,8 @@ def _clean_candidate(raw: str) -> str | None:
 
 
 def _normalize_payloads(candidates: list[str]) -> list[str]:
+    """去重并规范化 payload 列表。"""
+
     seen: set[str] = set()
     normalized: list[str] = []
     for item in candidates:
@@ -156,6 +181,8 @@ def _normalize_payloads(candidates: list[str]) -> list[str]:
 
 
 def _build_payload_entry(category: str, seq: int, payload: str, source_ref: str) -> dict:
+    """构造单条 payload 记录。"""
+
     high_risk = _is_high_risk(payload)
     mode = "attack" if high_risk else "test"
     risk_level = "high" if high_risk else "low"
@@ -174,6 +201,8 @@ def _build_payload_entry(category: str, seq: int, payload: str, source_ref: str)
 
 
 def _category_id_prefix(category: str) -> str:
+    """返回分类对应的 ID 前缀。"""
+
     mapping = {
         "sqli": "sqli",
         "xss": "xss",
@@ -184,11 +213,15 @@ def _category_id_prefix(category: str) -> str:
 
 
 def _is_high_risk(payload: str) -> bool:
+    """判断 payload 是否包含高风险特征。"""
+
     low = payload.lower()
     return any(marker in low for marker in HIGH_RISK_MARKERS)
 
 
 def _merge_incremental(existing_entries: list[dict], imported_entries: list[dict]) -> list[dict]:
+    """按 payload 键合并增量字典并保留本地策略字段。"""
+
     existing_by_payload = {
         _payload_key(item.get("payload", "")): dict(item)
         for item in existing_entries
@@ -217,10 +250,14 @@ def _merge_incremental(existing_entries: list[dict], imported_entries: list[dict
 
 
 def _payload_key(payload: str) -> str:
+    """生成 payload 去重键。"""
+
     return " ".join(str(payload).split())
 
 
 def _update_catalog(payload_dir: Path, counts: dict[str, int], repo_ref: str, incremental: bool) -> None:
+    """更新本地 payload 目录索引文件。"""
+
     catalog_file = payload_dir / "catalog.json"
     catalog: dict = {}
     if catalog_file.exists():

@@ -9,9 +9,20 @@ from scanner.detection.registry import PluginRegistry
 
 
 class DetectionExecutor:
+    """检测执行器。
+
+    负责遍历插件并将候选结果归并为 ``FindingBundle``。
+    """
+
     schema_version = "1.0"
 
     def __init__(self, registry: PluginRegistry | None = None) -> None:
+        """初始化插件注册表并装载默认插件。
+
+        Args:
+            registry: 可选插件注册表；为空时自动创建。
+        """
+
         self.registry = registry or PluginRegistry()
         for plugin in load_default_plugins():
             self.registry.register(plugin)
@@ -22,6 +33,17 @@ class DetectionExecutor:
         mode: str = "test",
         enabled_plugins: list[str] | None = None,
     ) -> dict:
+        """执行插件检测流程。
+
+        Args:
+            collection_bundle: 采集层输出。
+            mode: 执行模式（``test`` 或 ``attack``）。
+            enabled_plugins: 可选插件白名单。
+
+        Returns:
+            dict: 标准化 finding bundle。
+        """
+
         target = collection_bundle.get("target") or "unknown"
         bundle = FindingBundle(schema_version=self.schema_version, target=target)
 
@@ -71,4 +93,6 @@ class DetectionExecutor:
 
 
 def _utc_now_iso() -> str:
+    """获取 UTC ISO8601 时间字符串。"""
+
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")

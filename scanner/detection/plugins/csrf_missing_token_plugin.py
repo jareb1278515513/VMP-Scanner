@@ -5,7 +5,11 @@ from scanner.detection.payloads import PayloadDictionaryManager
 
 
 class CsrfMissingTokenPlugin(DetectionPlugin):
+    """检测表单缺失 CSRF Token 的插件。"""
+
     def metadata(self) -> dict:
+        """返回插件元数据。"""
+
         return {
             "name": "csrf_missing_token",
             "category": "csrf",
@@ -15,10 +19,14 @@ class CsrfMissingTokenPlugin(DetectionPlugin):
         }
 
     def match(self, collection_bundle: dict, mode: str) -> bool:
+        """判断输入中是否存在可检测表单。"""
+
         web_assets = collection_bundle.get("web_assets") or {}
         return bool(web_assets.get("forms"))
 
     def probe(self, collection_bundle: dict, mode: str) -> list[dict]:
+        """生成缺失 CSRF Token 的候选发现。"""
+
         web_assets = collection_bundle.get("web_assets") or {}
         manager = PayloadDictionaryManager()
         payloads = manager.load_payloads(
@@ -69,10 +77,14 @@ class CsrfMissingTokenPlugin(DetectionPlugin):
         return findings
 
     def verify(self, candidate: dict, collection_bundle: dict) -> bool:
+        """校验候选项位置字段完整性。"""
+
         location = candidate.get("location") or {}
         return bool(location.get("url"))
 
     def evidence(self, candidate: dict) -> dict:
+        """提取证据数据。"""
+
         raw = candidate.get("raw") or {}
         form = raw.get("form") or {}
         return {

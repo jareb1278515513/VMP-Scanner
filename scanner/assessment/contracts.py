@@ -5,6 +5,8 @@ from dataclasses import asdict, dataclass, field
 
 @dataclass(frozen=True)
 class AssessmentRequest:
+    """风险评估请求模型。"""
+
     findings: dict
     weights: dict = field(default_factory=dict)
     metadata: dict = field(default_factory=dict)
@@ -12,6 +14,8 @@ class AssessmentRequest:
 
 @dataclass(frozen=True)
 class RiskItem:
+    """风险条目模型。"""
+
     finding_id: str
     plugin: str
     category: str
@@ -28,11 +32,15 @@ class RiskItem:
     evidence: dict
 
     def to_dict(self) -> dict:
+        """序列化为字典。"""
+
         return asdict(self)
 
 
 @dataclass
 class RiskBundle:
+    """风险评估结果集合模型。"""
+
     schema_version: str
     target: str
     risk_items: list[RiskItem] = field(default_factory=list)
@@ -47,6 +55,8 @@ class RiskBundle:
     errors: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
+        """序列化为字典。"""
+
         return {
             "schema_version": self.schema_version,
             "target": self.target,

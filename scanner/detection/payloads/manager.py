@@ -9,17 +9,31 @@ VALID_RISK_LEVELS = {"low", "medium", "high"}
 
 
 class PayloadDictionaryManager:
+    """Payload 字典管理器。"""
+
     def __init__(self, base_dir: str | Path | None = None) -> None:
+        """初始化字典根目录并加载目录索引。
+
+        Args:
+            base_dir: payload 目录路径；为空时使用当前模块目录。
+        """
+
         self.base_dir = Path(base_dir) if base_dir else Path(__file__).resolve().parent
         self.catalog = self._load_json(self.base_dir / "catalog.json")
 
     def get_dictionary_version(self) -> str:
+        """返回字典版本号。"""
+
         return str(self.catalog.get("dictionary_version", "unknown"))
 
     def get_changelog(self) -> list[dict]:
+        """返回字典变更记录。"""
+
         return list(self.catalog.get("changelog", []))
 
     def list_categories(self) -> list[str]:
+        """返回已配置的 payload 分类。"""
+
         categories = self.catalog.get("categories", {})
         return sorted(categories.keys())
 
@@ -30,6 +44,21 @@ class PayloadDictionaryManager:
         include_high_risk: bool = False,
         include_disabled: bool = False,
     ) -> list[dict]:
+        """按分类与模式加载 payload。
+
+        Args:
+            category: payload 分类名。
+            mode: 使用模式（``test`` 或 ``attack``）。
+            include_high_risk: 是否包含高风险 payload。
+            include_disabled: 是否包含默认禁用 payload。
+
+        Returns:
+            list[dict]: 过滤后的 payload 列表。
+
+        Raises:
+            ValueError: 分类、模式或字典格式非法时抛出。
+        """
+
         category = category.strip().lower()
         mode = mode.strip().lower()
 
@@ -68,6 +97,8 @@ class PayloadDictionaryManager:
         include_high_risk: bool = False,
         include_disabled: bool = False,
     ) -> dict[str, list[dict]]:
+        """批量加载多个分类的 payload。"""
+
         result: dict[str, list[dict]] = {}
         for category in categories:
             result[category] = self.load_payloads(
@@ -79,6 +110,8 @@ class PayloadDictionaryManager:
         return result
 
     def _validate_record(self, record: dict, category: str) -> None:
+        """校验单条 payload 记录结构与枚举值。"""
+
         required = {
             "id",
             "payload",
@@ -102,5 +135,7 @@ class PayloadDictionaryManager:
 
     @staticmethod
     def _load_json(path: Path):
+        """读取 JSON 文件。"""
+
         with path.open("r", encoding="utf-8") as fp:
             return json.load(fp)

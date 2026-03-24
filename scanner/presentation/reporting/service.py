@@ -8,9 +8,23 @@ from pathlib import Path
 
 
 class PresentationService:
+    """报告渲染服务。
+
+    支持将扫描结果渲染为 JSON、Markdown 与交互式 HTML。
+    """
+
     schema_version = "1.0"
 
     def render(self, request: dict) -> dict:
+        """按输出配置渲染并写入报告文件。
+
+        Args:
+            request: 包含 collection/findings/risks/output/metadata 的输入字典。
+
+        Returns:
+            dict: 已写入文件路径映射。
+        """
+
         collection_bundle = request.get("collection") or {}
         finding_bundle = request.get("findings") or {}
         risk_bundle = request.get("risks") or {}
@@ -43,6 +57,8 @@ class PresentationService:
         risk_bundle: dict,
         metadata: dict,
     ) -> dict:
+        """聚合多层输出，生成统一报告结构。"""
+
         findings = list(finding_bundle.get("findings") or [])
         risks = list(risk_bundle.get("risk_items") or [])
 
@@ -106,6 +122,8 @@ class PresentationService:
         }
 
     def _render_markdown(self, report: dict) -> str:
+        """将统一报告渲染为 Markdown 文本。"""
+
         summary = (report.get("risks") or {}).get("summary") or {}
         network_summary = (report.get("assets") or {}).get("network_summary") or {}
         web_summary = (report.get("assets") or {}).get("web_summary") or {}
@@ -164,6 +182,8 @@ class PresentationService:
         return "\n".join(lines)
 
     def _render_html(self, report: dict) -> str:
+        """将统一报告渲染为交互式 HTML 页面。"""
+
         target = html.escape(str(report.get("target", "-")))
         generated_at = html.escape(str(report.get("generated_at", "-")))
         metadata = report.get("metadata") or {}
@@ -650,10 +670,14 @@ class PresentationService:
 
 
 def _utc_now_iso() -> str:
+    """获取 UTC ISO8601 时间字符串。"""
+
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _write_text(path_like: str, content: str) -> Path:
+    """写入文本文件并自动创建父目录。"""
+
     path = Path(path_like)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
@@ -661,4 +685,6 @@ def _write_text(path_like: str, content: str) -> Path:
 
 
 def _safe_json_for_html(value: object) -> str:
+    """将对象安全序列化为可嵌入 HTML 的 JSON 字符串。"""
+
     return json.dumps(value, ensure_ascii=False).replace("</", "<\\/")

@@ -19,7 +19,11 @@ SENSITIVE_PATH_HINTS = (
 
 
 class SensitivePathPlugin(DetectionPlugin):
+    """敏感路径暴露检测插件。"""
+
     def metadata(self) -> dict:
+        """返回插件元数据。"""
+
         return {
             "name": "sensitive_path",
             "category": "path_traversal",
@@ -29,11 +33,15 @@ class SensitivePathPlugin(DetectionPlugin):
         }
 
     def match(self, collection_bundle: dict, mode: str) -> bool:
+        """判断是否存在可用于探测的站点目标。"""
+
         target = str(collection_bundle.get("target") or "")
         web_assets = collection_bundle.get("web_assets") or {}
         return target.startswith(("http://", "https://")) or bool(web_assets.get("start_url"))
 
     def probe(self, collection_bundle: dict, mode: str) -> list[dict]:
+        """探测常见敏感路径并生成候选发现。"""
+
         target = str(collection_bundle.get("target") or "")
         web_assets = collection_bundle.get("web_assets") or {}
         base_url = str(web_assets.get("start_url") or target)
@@ -110,14 +118,20 @@ class SensitivePathPlugin(DetectionPlugin):
         return findings
 
     def verify(self, candidate: dict, collection_bundle: dict) -> bool:
+        """校验候选状态码是否在可接受范围。"""
+
         raw = candidate.get("raw") or {}
         return int(raw.get("status", 0)) in (200, 401, 403)
 
     def evidence(self, candidate: dict) -> dict:
+        """提取候选项证据。"""
+
         return dict(candidate.get("raw") or {})
 
 
 def _extract_path_candidates(payloads: list[dict]) -> list[str]:
+    """从 payload 字典中提取路径候选。"""
+
     result: list[str] = []
     for item in payloads:
         text = str(item.get("payload") or "").strip()
@@ -133,6 +147,8 @@ def _extract_path_candidates(payloads: list[dict]) -> list[str]:
 
 
 def _normalize_path(path: str) -> str:
+    """规范化路径字符串。"""
+
     normalized = path.strip()
     if not normalized:
         return ""
@@ -142,6 +158,8 @@ def _normalize_path(path: str) -> str:
 
 
 def _extract_sensitive_feature(body: str) -> str | None:
+    """提取响应中的敏感信息特征。"""
+
     lowered = body.lower()
     markers = (
         "root:x:0:0",
@@ -157,6 +175,8 @@ def _extract_sensitive_feature(body: str) -> str | None:
 
 
 def _apply_session_cookies(session: requests.Session, collection_bundle: dict) -> None:
+    """将采集层会话 Cookie 注入请求会话。"""
+
     metadata = collection_bundle.get("metadata") or {}
     cookies = metadata.get("session_cookies") or {}
     if isinstance(cookies, dict) and cookies:

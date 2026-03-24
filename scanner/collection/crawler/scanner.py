@@ -35,6 +35,8 @@ SUSPICIOUS_RESPONSE_MARKERS = (
 
 @dataclass(frozen=True)
 class CrawlConfig:
+    """爬虫运行配置。"""
+
     start_url: str
     max_depth: int = 2
     timeout: float = 5.0
@@ -44,6 +46,19 @@ class CrawlConfig:
 
 
 def normalize_url(raw_url: str, base_url: str | None = None) -> str:
+    """标准化 URL（补全、排序参数、移除片段）。
+
+    Args:
+        raw_url: 原始 URL 或相对路径。
+        base_url: 可选基准 URL。
+
+    Returns:
+        str: 标准化后的绝对 URL。
+
+    Raises:
+        ValueError: URL 非法或协议不支持时抛出。
+    """
+
     candidate = (raw_url or "").strip()
     if not candidate:
         raise ValueError("Empty URL is not supported.")
@@ -77,6 +92,15 @@ def normalize_url(raw_url: str, base_url: str | None = None) -> str:
 
 
 def parse_cookie_header(cookie_header: str | None) -> dict[str, str]:
+    """解析 ``Cookie`` 请求头为键值对。
+
+    Args:
+        cookie_header: 原始 Cookie 字符串。
+
+    Returns:
+        dict[str, str]: Cookie 映射。
+    """
+
     if not cookie_header:
         return {}
 
@@ -107,6 +131,30 @@ def build_form_login_session(
     success_keyword: str | None = None,
     session: requests.Session | None = None,
 ) -> requests.Session:
+    """通过登录表单建立已认证会话。
+
+    Args:
+        base_url: 目标站点基地址。
+        username: 用户名。
+        password: 密码。
+        timeout: HTTP 超时时间（秒）。
+        login_url: 可选登录页面 URL。
+        username_field: 用户名字段名。
+        password_field: 密码字段名。
+        csrf_field: CSRF 字段名。
+        submit_field: 提交按钮字段名。
+        submit_value: 提交按钮字段值。
+        extra_form_fields: 额外表单字段。
+        success_keyword: 判定登录成功的关键字。
+        session: 可选外部会话。
+
+    Returns:
+        requests.Session: 已登录会话对象。
+
+    Raises:
+        ValueError: 登录失败或请求异常时抛出。
+    """
+
     normalized_base = normalize_url(base_url)
     actual_login_url = normalize_url(login_url, base_url=normalized_base) if login_url else normalized_base
 
@@ -158,6 +206,20 @@ def crawl_web_state(
     cookies: dict[str, str] | None = None,
     session: requests.Session | None = None,
 ) -> dict:
+    """执行页面爬取并提取 URL、表单和可疑端点。
+
+    Args:
+        start_url: 起始 URL。
+        max_depth: 最大深度。
+        timeout: 请求超时。
+        allowed_domains: 允许爬取域名集合。
+        cookies: 初始 Cookie。
+        session: 可复用会话。
+
+    Returns:
+        dict: 爬虫报告字典。
+    """
+
     normalized_start = normalize_url(start_url)
     parsed_start = urlparse(normalized_start)
 
@@ -292,6 +354,8 @@ def crawl_web_state(
 
 
 def _is_html_response(response: requests.Response) -> bool:
+    """判断响应是否为 HTML 内容。"""
+
     content_type = (response.headers.get("Content-Type") or "").lower()
     if "text/html" in content_type or "application/xhtml+xml" in content_type:
         return True
@@ -299,6 +363,8 @@ def _is_html_response(response: requests.Response) -> bool:
 
 
 def _extract_link_candidates(soup: BeautifulSoup) -> list[str]:
+    """从文档中提取后续可访问的链接候选。"""
+
     candidates: list[str] = []
 
     for tag in soup.select("a[href]"):
@@ -326,6 +392,8 @@ def _extract_forms(
     report: CrawlReport,
     form_seen: set[tuple[str, str, str, tuple[tuple[str, str], ...]]],
 ) -> None:
+    """提取页面表单并写入报告。"""
+
     for form in soup.find_all("form"):
         raw_action = (form.get("action") or "").strip() or page_url
         try:
@@ -377,6 +445,8 @@ def _append_discovered_url(
     depth: int,
     status_code: int | None,
 ) -> None:
+    """将新 URL 记录写入报告并去重。"""
+
     dedup_key = (url, method.upper())
     if dedup_key in url_seen:
         return
@@ -395,6 +465,8 @@ def _append_discovered_url(
 
 
 def _is_domain_allowed(hostname: str, allowlist: set[str] | None) -> bool:
+    """判断域名是否在允许列表内。"""
+
     if not allowlist:
         return True
 
@@ -412,6 +484,8 @@ def _collect_suspicious_from_url(
     url: str,
     depth: int,
 ) -> None:
+    """从 URL 文本中提取可疑路径迹象。"""
+
     low = url.lower()
     for marker in SUSPICIOUS_PATH_MARKERS:
         if marker in low:
@@ -437,6 +511,8 @@ def _collect_suspicious_from_response(
     text: str,
     depth: int,
 ) -> None:
+    """从响应正文中提取可疑回显迹象。"""
+
     low = text.lower()
     for marker in SUSPICIOUS_RESPONSE_MARKERS:
         if marker in low:
@@ -456,6 +532,8 @@ def _collect_suspicious_from_response(
 
 
 def _extract_hidden_input_value(html: str, field_name: str) -> str | None:
+    """提取指定隐藏字段的值。"""
+
     soup = BeautifulSoup(html, "html.parser")
     target = soup.find("input", attrs={"name": field_name})
     if not target:
@@ -471,6 +549,8 @@ def _is_login_success(
     login_url: str,
     success_keyword: str | None,
 ) -> bool:
+    """判断登录请求是否成功。"""
+
     if success_keyword:
         return success_keyword.lower() in response.text.lower()
 
@@ -485,6 +565,18 @@ def _is_login_success(
 
 
 def parse_key_value_pairs(items: Iterable[str] | None) -> dict[str, str]:
+    """解析 ``key=value`` 列表。
+
+    Args:
+        items: 输入键值串列表。
+
+    Returns:
+        dict[str, str]: 解析结果。
+
+    Raises:
+        ValueError: 任一项不满足 ``key=value`` 约定时抛出。
+    """
+
     result: dict[str, str] = {}
     for item in items or []:
         raw = item.strip()

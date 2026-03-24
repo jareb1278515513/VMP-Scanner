@@ -5,6 +5,8 @@ from dataclasses import asdict, dataclass, field
 
 @dataclass(frozen=True)
 class Finding:
+    """单条漏洞发现模型。"""
+
     id: str
     plugin: str
     category: str
@@ -16,11 +18,15 @@ class Finding:
     created_at: str
 
     def to_dict(self) -> dict:
+        """序列化为字典。"""
+
         return asdict(self)
 
 
 @dataclass
 class FindingBundle:
+    """检测结果集合模型。"""
+
     schema_version: str
     target: str
     findings: list[Finding] = field(default_factory=list)
@@ -35,6 +41,8 @@ class FindingBundle:
     errors: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
+        """序列化为字典。"""
+
         return {
             "schema_version": self.schema_version,
             "target": self.target,

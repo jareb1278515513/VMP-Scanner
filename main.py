@@ -1,3 +1,9 @@
+"""VMP-Scanner 命令行入口。
+
+该模块负责参数解析、运行时配置装配以及四层服务编排：
+collection -> detection -> assessment -> presentation。
+"""
+
 import argparse
 import json
 import logging
@@ -17,6 +23,16 @@ TOOL_VERSION = "0.1.0"
 
 @dataclass(frozen=True)
 class DefaultConfig:
+    """默认运行配置。
+
+    Attributes:
+        target: 默认扫描目标。
+        mode: 默认检测模式。
+        max_depth: 爬虫最大深度。
+        concurrency: 网络扫描并发数。
+        timeout: 默认网络超时时间（秒）。
+    """
+
     target: str = "127.0.0.1"
     mode: str = "detect"
     max_depth: int = 2
@@ -56,6 +72,12 @@ class DefaultConfig:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """构建命令行参数解析器。
+
+    Returns:
+        argparse.ArgumentParser: 已注册全部 CLI 选项的解析器。
+    """
+
     parser = argparse.ArgumentParser(
         prog="vmp-scanner",
         description="VMP-Scanner CLI entrypoint",
@@ -222,6 +244,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def load_runtime_config(args: argparse.Namespace) -> dict:
+    """将 CLI 参数合并为运行时配置字典。
+
+    Args:
+        args: 解析后的命令行参数对象。
+
+    Returns:
+        dict: 最终运行配置。
+    """
+
     config = asdict(DefaultConfig())
 
     if args.target:
@@ -302,6 +333,12 @@ def load_runtime_config(args: argparse.Namespace) -> dict:
 
 
 def configure_logging(level: str) -> None:
+    """配置全局日志格式和级别。
+
+    Args:
+        level: 日志级别字符串，例如 ``INFO``、``DEBUG``。
+    """
+
     logging.basicConfig(
         level=getattr(logging, level.upper(), logging.INFO),
         format="%(asctime)s | %(levelname)s | %(message)s",
@@ -319,6 +356,19 @@ PLUGIN_OPTION_ALIASES = {
 
 
 def _parse_plugin_value_pairs(items: list[str] | None, cast):
+    """解析 ``plugin=value`` 形式的插件覆盖配置。
+
+    Args:
+        items: 覆盖项列表。
+        cast: 值转换函数，例如 ``int`` 或 ``float``。
+
+    Returns:
+        dict[str, int | float]: 解析后的插件配置映射。
+
+    Raises:
+        ValueError: 输入格式非法时抛出。
+    """
+
     result: dict[str, int | float] = {}
     if not items:
         return result
@@ -335,6 +385,15 @@ def _parse_plugin_value_pairs(items: list[str] | None, cast):
 
 
 def build_detection_metadata(runtime_config: dict) -> dict:
+    """构建检测层元数据（默认值与插件级覆盖）。
+
+    Args:
+        runtime_config: 运行时配置字典。
+
+    Returns:
+        dict: 供检测插件读取的标准化配置。
+    """
+
     defaults_timeout = runtime_config.get("detection_plugin_timeout")
     defaults_max_targets = runtime_config.get("detection_plugin_max_targets")
     timeout_overrides = _parse_plugin_value_pairs(runtime_config.get("plugin_timeout"), float)
@@ -379,6 +438,16 @@ def build_detection_metadata(runtime_config: dict) -> dict:
 
 
 def resolve_enabled_plugins(runtime_config: dict, available_plugins: list[str]) -> list[str] | None:
+    """根据启用/禁用策略计算最终生效插件集合。
+
+    Args:
+        runtime_config: 运行时配置字典。
+        available_plugins: 当前可用插件名称列表。
+
+    Returns:
+        list[str] | None: 生效插件名称列表；不限制时返回 ``None``。
+    """
+
     available_set = {name.lower() for name in available_plugins}
 
     enabled = runtime_config.get("enable_plugins") or []
@@ -402,6 +471,12 @@ def resolve_enabled_plugins(runtime_config: dict, available_plugins: list[str]) 
 
 
 def main() -> int:
+    """执行扫描主流程并返回进程退出码。
+
+    Returns:
+        int: 成功返回 0，失败返回 1。
+    """
+
     parser = build_parser()
     args = parser.parse_args()
     configure_logging(args.log_level)

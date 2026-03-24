@@ -5,6 +5,8 @@ from dataclasses import asdict, dataclass, field
 
 @dataclass(frozen=True)
 class NetworkCollectionOptions:
+    """网络采集选项。"""
+
     ports: str | None = "80,443,8080,3306"
     port_range: str | None = None
     grab_banner: bool = False
@@ -12,6 +14,8 @@ class NetworkCollectionOptions:
 
 @dataclass(frozen=True)
 class AuthOptions:
+    """自动登录认证选项。"""
+
     enabled: bool = False
     login_url: str | None = None
     username: str = "admin"
@@ -27,6 +31,8 @@ class AuthOptions:
 
 @dataclass(frozen=True)
 class CrawlerCollectionOptions:
+    """Web 爬虫采集选项。"""
+
     enabled: bool = True
     max_depth: int = 2
     allowed_domains: list[str] | None = None
@@ -36,6 +42,8 @@ class CrawlerCollectionOptions:
 
 @dataclass(frozen=True)
 class CollectionRequest:
+    """采集请求模型。"""
+
     target: str
     mode: str = "test"
     timeout: float = 1.0
@@ -47,6 +55,8 @@ class CollectionRequest:
 
 @dataclass
 class CollectionBundle:
+    """采集结果模型。"""
+
     schema_version: str
     target: str
     started_at: str
@@ -57,4 +67,6 @@ class CollectionBundle:
     metadata: dict = field(default_factory=dict)
 
     def to_dict(self) -> dict:
+        """序列化为字典。"""
+
         return asdict(self)

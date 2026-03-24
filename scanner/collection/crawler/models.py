@@ -5,6 +5,8 @@ from dataclasses import asdict, dataclass, field
 
 @dataclass(frozen=True)
 class DiscoveredUrl:
+    """爬虫发现的 URL 记录。"""
+
     url: str
     method: str
     params: list[str]
@@ -13,11 +15,15 @@ class DiscoveredUrl:
     status_code: int | None
 
     def to_dict(self) -> dict:
+        """序列化为字典。"""
+
         return asdict(self)
 
 
 @dataclass(frozen=True)
 class FormField:
+    """表单字段描述。"""
+
     name: str
     input_type: str
     required: bool
@@ -25,6 +31,8 @@ class FormField:
 
 @dataclass(frozen=True)
 class DiscoveredForm:
+    """爬虫发现的表单信息。"""
+
     page_url: str
     action: str
     method: str
@@ -33,6 +41,8 @@ class DiscoveredForm:
     depth: int
 
     def to_dict(self) -> dict:
+        """序列化为字典。"""
+
         payload = asdict(self)
         payload["fields"] = [asdict(field) for field in self.fields]
         return payload
@@ -40,17 +50,23 @@ class DiscoveredForm:
 
 @dataclass(frozen=True)
 class SuspiciousEndpoint:
+    """可疑端点记录。"""
+
     url: str
     reason: str
     evidence: str
     depth: int
 
     def to_dict(self) -> dict:
+        """序列化为字典。"""
+
         return asdict(self)
 
 
 @dataclass
 class CrawlReport:
+    """爬取结果聚合模型。"""
+
     start_url: str
     max_depth: int
     visited_count: int = 0
@@ -62,6 +78,8 @@ class CrawlReport:
     errors: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
+        """序列化为字典。"""
+
         return {
             "start_url": self.start_url,
             "max_depth": self.max_depth,

@@ -9,6 +9,12 @@ from scanner.detection.plugins.xss_plugin import ReflectedXssPlugin
 
 
 def load_default_plugins() -> list:
+	"""加载默认检测插件列表。
+
+	Returns:
+		list: 按推荐顺序返回默认插件实例。
+	"""
+
 	return [
 		SuspiciousEndpointPlugin(),
 		SqlInjectionPlugin(),

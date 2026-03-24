@@ -10,7 +10,11 @@ from scanner.detection.payloads import PayloadDictionaryManager
 
 
 class ReflectedXssPlugin(DetectionPlugin):
+    """反射型 XSS 检测插件。"""
+
     def metadata(self) -> dict:
+        """返回插件元数据。"""
+
         return {
             "name": "xss_reflected",
             "category": "xss",
@@ -20,9 +24,13 @@ class ReflectedXssPlugin(DetectionPlugin):
         }
 
     def match(self, collection_bundle: dict, mode: str) -> bool:
+        """判断是否存在可探测目标。"""
+
         return bool(_build_probe_targets(collection_bundle))
 
     def probe(self, collection_bundle: dict, mode: str) -> list[dict]:
+        """执行 XSS payload 注入并生成候选发现。"""
+
         targets = _build_probe_targets(collection_bundle)
         if not targets:
             return []
@@ -124,6 +132,8 @@ class ReflectedXssPlugin(DetectionPlugin):
         return findings
 
     def verify(self, candidate: dict, collection_bundle: dict) -> bool:
+        """校验候选在当前模式下是否成立。"""
+
         raw = candidate.get("raw") or {}
         mode = raw.get("mode", "test")
         if mode == "attack":
@@ -131,10 +141,14 @@ class ReflectedXssPlugin(DetectionPlugin):
         return bool(raw.get("contains_raw") or raw.get("contains_escaped"))
 
     def evidence(self, candidate: dict) -> dict:
+        """提取候选项证据。"""
+
         return dict(candidate.get("raw") or {})
 
 
 def _with_param(url: str, name: str, value: str) -> str:
+    """替换 URL 单个查询参数。"""
+
     parsed = urlparse(url)
     query = parse_qs(parsed.query, keep_blank_values=True)
     query[name] = [value]
@@ -143,6 +157,8 @@ def _with_param(url: str, name: str, value: str) -> str:
 
 
 def _with_params(url: str, values: dict[str, str]) -> str:
+    """批量替换 URL 查询参数。"""
+
     parsed = urlparse(url)
     query = parse_qs(parsed.query, keep_blank_values=True)
     for key, value in values.items():
@@ -152,6 +168,8 @@ def _with_params(url: str, values: dict[str, str]) -> str:
 
 
 def _build_probe_targets(collection_bundle: dict) -> list[dict]:
+    """从采集结果构建 XSS 探测目标。"""
+
     web_assets = collection_bundle.get("web_assets") or {}
 
     targets: list[dict] = []
@@ -203,6 +221,8 @@ def _build_probe_targets(collection_bundle: dict) -> list[dict]:
 
 
 def _build_form_baseline(fields: list[dict]) -> dict[str, str]:
+    """构建表单基线提交数据。"""
+
     data: dict[str, str] = {}
     first_submit: str | None = None
 
@@ -231,6 +251,8 @@ def _build_form_baseline(fields: list[dict]) -> dict[str, str]:
 
 
 def _apply_session_cookies(session: requests.Session, collection_bundle: dict) -> None:
+    """将采集层会话 Cookie 注入请求会话。"""
+
     metadata = collection_bundle.get("metadata") or {}
     cookies = metadata.get("session_cookies") or {}
     if isinstance(cookies, dict) and cookies:
@@ -238,6 +260,8 @@ def _apply_session_cookies(session: requests.Session, collection_bundle: dict) -
 
 
 def _pick_xss_payload(payloads: list[dict], mode: str) -> dict | None:
+    """按模式选择最合适的 XSS payload。"""
+
     for item in payloads:
         payload = str(item.get("payload") or "")
         lowered = payload.lower()
@@ -258,6 +282,8 @@ def _pick_xss_payload(payloads: list[dict], mode: str) -> dict | None:
 
 
 def _build_injection(payload: str, marker: str, mode: str) -> str:
+    """构建最终注入字符串。"""
+
     if mode == "attack":
         if payload and "<script" in payload.lower() and "</script>" in payload.lower():
             return payload.replace("</script>", f"{marker}</script>", 1)

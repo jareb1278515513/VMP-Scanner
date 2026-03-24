@@ -21,9 +21,23 @@ from scanner.collection.network.scanner import normalize_target_host, parse_port
 
 
 class CollectionService:
+    """资产采集服务。
+
+    负责执行网络端口扫描与 Web 爬取，并汇总为统一的 collection bundle。
+    """
+
     schema_version = "1.0"
 
     def collect(self, request: CollectionRequest | dict) -> dict:
+        """执行采集流程并返回标准化结果。
+
+        Args:
+            request: 采集请求对象或等价字典。
+
+        Returns:
+            dict: 采集结果（网络资产、Web 资产、错误信息与元数据）。
+        """
+
         normalized_request = _coerce_request(request)
         started_at = _utc_now_iso()
 
@@ -124,10 +138,24 @@ class CollectionService:
 
 
 def _utc_now_iso() -> str:
+    """获取 UTC ISO8601 时间字符串。"""
+
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _coerce_request(request: CollectionRequest | dict) -> CollectionRequest:
+    """将输入转换为 ``CollectionRequest``。
+
+    Args:
+        request: 原始请求对象或字典。
+
+    Returns:
+        CollectionRequest: 标准化后的请求对象。
+
+    Raises:
+        ValueError: 请求缺失必要字段或类型非法时抛出。
+    """
+
     if isinstance(request, CollectionRequest):
         return request
 

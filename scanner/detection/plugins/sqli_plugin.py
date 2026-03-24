@@ -19,7 +19,11 @@ SQL_ERROR_MARKERS = (
 
 
 class SqlInjectionPlugin(DetectionPlugin):
+    """SQL 注入检测插件。"""
+
     def metadata(self) -> dict:
+        """返回插件元数据。"""
+
         return {
             "name": "sqli_basic",
             "category": "sqli",
@@ -29,9 +33,13 @@ class SqlInjectionPlugin(DetectionPlugin):
         }
 
     def match(self, collection_bundle: dict, mode: str) -> bool:
+        """判断是否存在可注入探测目标。"""
+
         return bool(_build_probe_targets(collection_bundle))
 
     def probe(self, collection_bundle: dict, mode: str) -> list[dict]:
+        """基于布尔盲注与错误回显生成候选发现。"""
+
         targets = _build_probe_targets(collection_bundle)
         if not targets:
             return []
@@ -129,14 +137,20 @@ class SqlInjectionPlugin(DetectionPlugin):
         return findings
 
     def verify(self, candidate: dict, collection_bundle: dict) -> bool:
+        """验证候选是否存在有效 SQL 异常特征。"""
+
         raw = candidate.get("raw") or {}
         return bool(raw.get("error_marker") or raw.get("boolean_diff"))
 
     def evidence(self, candidate: dict) -> dict:
+        """提取候选项证据。"""
+
         return dict(candidate.get("raw") or {})
 
 
 def _pick_boolean_pair(payloads: list[dict]) -> tuple[str, str]:
+    """选择真假分支布尔注入 payload 对。"""
+
     true_payload = "' OR '1'='1' --"
     false_payload = "' AND '1'='2' --"
 
@@ -152,6 +166,8 @@ def _pick_boolean_pair(payloads: list[dict]) -> tuple[str, str]:
 
 
 def _with_param(url: str, name: str, value: str) -> str:
+    """替换 URL 查询参数值。"""
+
     parsed = urlparse(url)
     query = parse_qs(parsed.query, keep_blank_values=True)
     query[name] = [value]
@@ -160,6 +176,8 @@ def _with_param(url: str, name: str, value: str) -> str:
 
 
 def _pick_attack_payload(payloads: list[dict]) -> str | None:
+    """选择攻击模式优先使用的 payload。"""
+
     for item in payloads:
         payload = str(item.get("payload") or "")
         lowered = payload.lower()
@@ -169,6 +187,8 @@ def _pick_attack_payload(payloads: list[dict]) -> str | None:
 
 
 def _extract_attack_feature(body: str) -> str | None:
+    """从响应中提取攻击模式特征回显。"""
+
     lowered = body.lower()
     markers = (
         "information_schema",
@@ -184,6 +204,8 @@ def _extract_attack_feature(body: str) -> str | None:
 
 
 def _build_probe_targets(collection_bundle: dict) -> list[dict]:
+    """从 URL 与表单中构建 SQL 注入探测目标。"""
+
     web_assets = collection_bundle.get("web_assets") or {}
 
     targets: list[dict] = []
@@ -220,6 +242,8 @@ def _build_probe_targets(collection_bundle: dict) -> list[dict]:
 
 
 def _apply_session_cookies(session: requests.Session, collection_bundle: dict) -> None:
+    """将采集层会话 Cookie 注入请求会话。"""
+
     metadata = collection_bundle.get("metadata") or {}
     cookies = metadata.get("session_cookies") or {}
     if isinstance(cookies, dict) and cookies:
