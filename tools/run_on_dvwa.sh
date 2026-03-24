@@ -84,7 +84,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT"
 
 timestamp="$(date +"%Y%m%d-%H%M%S")"
-out_dir="$REPORT_DIR/dvwa-quick-$timestamp"
+out_dir="$REPORT_DIR/dvwa-$timestamp"
 mkdir -p "$out_dir"
 
 json_report="$out_dir/risk-report.json"

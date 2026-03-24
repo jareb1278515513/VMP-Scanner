@@ -131,7 +131,7 @@ class PresentationService:
         lines.append("")
         lines.append("## 3. Risk Summary")
         lines.append("")
-        lines.append("| Critical | High | Medium | Low |")
+        lines.append("| 严重 | 高危 | 中危 | 低危 |")
         lines.append("| --- | --- | --- | --- |")
         lines.append(f"| {summary.get('critical', 0)} | {summary.get('high', 0)} | {summary.get('medium', 0)} | {summary.get('low', 0)} |")
         lines.append("")
@@ -181,7 +181,7 @@ class PresentationService:
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VMP 安全风险报告</title>
+  <title>VMP-SCANNER 安全风险报告</title>
   <style>
     :root {{
       --bg: #f5f5f7;
@@ -242,7 +242,19 @@ class PresentationService:
     thead th {{ position: sticky; top: 0; background: #fafafc; z-index: 1; color: #56565b; }}
     tbody tr {{ cursor: pointer; }}
     tbody tr:hover {{ background: rgba(0,113,227,.06); }}
-    .badge {{ border-radius: 999px; padding: 5px 9px; font-size: 11px; color: #fff; text-transform: uppercase; font-weight: 700; }}
+    .badge {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      white-space: nowrap;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      line-height: 1;
+      color: #fff;
+      font-weight: 700;
+    }}
     .critical {{ background: var(--critical); }}
     .high {{ background: var(--high); }}
     .medium {{ background: var(--medium); }}
@@ -273,21 +285,22 @@ class PresentationService:
 <body>
   <div class="wrap">
     <section class="hero" id="overview">
-      <h1>安全风险总览 <span style="font-weight:500;color:#6e6e73;">Security Intelligence</span></h1>
-      <div class="sub">目标 Target: {target}</div>
+      <h1>VMP-SCANNER 安全风险总览</h1>
+      <div class="sub">目标：{target}</div>
       <div class="chips">
-        <span class="chip">生成时间 Generated: {generated_at}</span>
-        <span class="chip">模式 Mode: {mode}</span>
-        <span class="chip">版本 Version: {tool_version}</span>
+        <span class="chip">项目：VMP-SCANNER</span>
+        <span class="chip">生成时间：{generated_at}</span>
+        <span class="chip">模式：{mode}</span>
+        <span class="chip">版本：{tool_version}</span>
       </div>
       <div class="metrics">
-        <div class="metric metric-card" data-level=""><div class="k">发现 Findings</div><div class="v" id="metric-findings">{int(vulnerabilities.get('total', 0))}</div></div>
-        <div class="metric metric-card" data-level=""><div class="k">风险 Risks</div><div class="v" id="metric-risks">{len(risks)}</div></div>
-        <div class="metric metric-card" data-level="Critical"><div class="k">Critical</div><div class="v">{int(summary.get('critical', 0))}</div></div>
-        <div class="metric metric-card" data-level="High"><div class="k">High</div><div class="v">{int(summary.get('high', 0))}</div></div>
-        <div class="metric metric-card" data-level="Medium"><div class="k">Medium</div><div class="v">{int(summary.get('medium', 0))}</div></div>
-        <div class="metric metric-card" data-level="Low"><div class="k">Low</div><div class="v">{int(summary.get('low', 0))}</div></div>
-        <div class="metric"><div class="k">开放端口 Open Ports</div><div class="v">{int(network_summary.get('open_ports', 0))}</div></div>
+        <div class="metric metric-card" data-level=""><div class="k">发现数</div><div class="v" id="metric-findings">{int(vulnerabilities.get('total', 0))}</div></div>
+        <div class="metric metric-card" data-level=""><div class="k">风险数</div><div class="v" id="metric-risks">{len(risks)}</div></div>
+        <div class="metric metric-card" data-level="Critical"><div class="k">严重</div><div class="v">{int(summary.get('critical', 0))}</div></div>
+        <div class="metric metric-card" data-level="High"><div class="k">高危</div><div class="v">{int(summary.get('high', 0))}</div></div>
+        <div class="metric metric-card" data-level="Medium"><div class="k">中危</div><div class="v">{int(summary.get('medium', 0))}</div></div>
+        <div class="metric metric-card" data-level="Low"><div class="k">低危</div><div class="v">{int(summary.get('low', 0))}</div></div>
+        <div class="metric"><div class="k">开放端口</div><div class="v">{int(network_summary.get('open_ports', 0))}</div></div>
         <div class="metric"><div class="k">页面 URL</div><div class="v">{int(web_summary.get('urls', 0))}</div></div>
       </div>
       <div class="quick-nav">
@@ -302,7 +315,7 @@ class PresentationService:
 
     <section class="controls" id="filters">
       <input id="searchInput" class="input control-search" placeholder="搜索标题、分类、插件或 URL" />
-      <select id="levelSelect" class="select"><option value="">全部等级</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select>
+      <select id="levelSelect" class="select"><option value="">全部等级</option><option value="Critical">严重</option><option value="High">高危</option><option value="Medium">中危</option><option value="Low">低危</option></select>
       <select id="categorySelect" class="select"><option value="">全部分类</option></select>
       <select id="pluginSelect" class="select"><option value="">全部插件</option></select>
       <select id="assetSelect" class="select"><option value="">全部目标资产</option></select>
@@ -312,17 +325,17 @@ class PresentationService:
 
     <section class="grid">
       <article class="panel" id="risk-table">
-        <div class="panel-head"><span>风险条目 Risk Items</span><span id="rowCounter">0 条</span></div>
+        <div class="panel-head"><span>风险条目</span><span id="rowCounter">0 条</span></div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>等级 Level</th><th>分数 Score</th><th>分类 Category</th><th>插件 Plugin</th><th>状态码</th><th>标题 Title</th><th>位置 URL</th></tr></thead>
+            <thead><tr><th>等级</th><th>分数</th><th>分类</th><th>插件</th><th>状态码</th><th>标题</th><th>位置 URL</th></tr></thead>
             <tbody id="riskBody"></tbody>
           </table>
         </div>
       </article>
 
       <aside class="panel" id="distribution">
-        <div class="panel-head">风险分布 Risk Distribution</div>
+        <div class="panel-head">风险分布</div>
         <div class="plot">
           <div class="ring" id="ring"><div class="ring-t"><div><strong id="ringTotal">0</strong>总风险数</div></div></div>
           <div class="legend" id="legend"></div>
@@ -332,7 +345,7 @@ class PresentationService:
     </section>
 
     <section class="panel" id="recommendations" style="margin-top:12px;">
-      <div class="panel-head"><span>修复建议 Recommendations</span><span id="recCounter">0 组</span></div>
+      <div class="panel-head"><span>修复建议</span><span id="recCounter">0 组</span></div>
       <div class="stack-actions">
         <button id="expandAllRecsBtn" type="button">全部展开</button>
         <button id="collapseAllRecsBtn" type="button">全部折叠</button>
@@ -345,11 +358,11 @@ class PresentationService:
     <button id="closeDrawer">关闭</button>
     <h2 id="detailTitle">风险详情</h2>
     <p id="detailMeta"></p>
-    <h4>修复建议 Recommendation</h4>
+    <h4>修复建议</h4>
     <div id="detailRecommendation" class="kv"></div>
-    <h4>复测建议 Retest</h4>
+    <h4>复测建议</h4>
     <div id="detailRetest" class="kv"></div>
-    <h4>证据 Evidence</h4>
+    <h4>证据</h4>
     <div id="detailEvidence" class="kv"></div>
   </aside>
 
@@ -430,6 +443,15 @@ class PresentationService:
       return String(level || 'low').toLowerCase();
     }}
 
+    function levelLabel(level) {{
+      const key = String(level || 'Low');
+      if (key === 'Critical') return '严重';
+      if (key === 'High') return '高危';
+      if (key === 'Medium') return '中危';
+      if (key === 'Low') return '低危';
+      return key;
+    }}
+
     function itemText(item) {{
       const url = String(item?.location?.url || '');
       const param = String(item?.location?.param || '');
@@ -485,7 +507,7 @@ class PresentationService:
 
     function showDetail(item) {{
       document.getElementById('detailTitle').textContent = item?.title || '风险详情';
-      document.getElementById('detailMeta').textContent = `${{item?.level || '-'}} · ${{item?.category || '-'}} · score=${{Number(item?.score || 0).toFixed(2)}}`;
+      document.getElementById('detailMeta').textContent = `${{levelLabel(item?.level || '-') }} · ${{item?.category || '-'}} · 分数=${{Number(item?.score || 0).toFixed(2)}}`;
       document.getElementById('detailRecommendation').textContent = item?.recommendation || '-';
       document.getElementById('detailRetest').textContent = item?.retest || '-';
       document.getElementById('detailEvidence').textContent = JSON.stringify(item?.evidence || {{}}, null, 2);
@@ -499,7 +521,7 @@ class PresentationService:
         const url = String(item?.location?.url || '-');
         const status = getStatusCode(item);
         row.innerHTML = `
-          <td><span class="badge ${{normalizedLevel(item.level)}}">${{item.level || 'Low'}}</span></td>
+          <td><span class="badge ${{normalizedLevel(item.level)}}">${{levelLabel(item.level || 'Low')}}</span></td>
           <td>${{Number(item.score || 0).toFixed(2)}}</td>
           <td>${{item.category || '-'}}</td>
           <td>${{item.plugin || '-'}}</td>
@@ -536,8 +558,8 @@ class PresentationService:
         item.innerHTML = `
           <summary><span>${{row.category}}</span><strong>${{row.count}} 条</strong></summary>
           <div class="rec-body">
-            <div><strong>Recommendation:</strong> ${{row.recommendation}}</div>
-            <div style="margin-top:8px;"><strong>Retest:</strong> ${{row.retest}}</div>
+            <div><strong>修复建议：</strong>${{row.recommendation}}</div>
+            <div style="margin-top:8px;"><strong>复测建议：</strong>${{row.retest}}</div>
           </div>
         `;
         recommendationList.appendChild(item);
@@ -558,10 +580,10 @@ class PresentationService:
       ring.style.background = `conic-gradient(var(--critical) 0deg ${{c}}deg, var(--high) ${{c}}deg ${{h}}deg, var(--medium) ${{h}}deg ${{m}}deg, var(--low) ${{m}}deg 360deg)`;
       ringTotal.textContent = String(items.length);
       legend.innerHTML = `
-        <div><span><span class="dot" style="background:var(--critical)"></span>Critical</span><strong>${{counts.Critical}}</strong></div>
-        <div><span><span class="dot" style="background:var(--high)"></span>High</span><strong>${{counts.High}}</strong></div>
-        <div><span><span class="dot" style="background:var(--medium)"></span>Medium</span><strong>${{counts.Medium}}</strong></div>
-        <div><span><span class="dot" style="background:var(--low)"></span>Low</span><strong>${{counts.Low}}</strong></div>
+        <div><span><span class="dot" style="background:var(--critical)"></span>严重</span><strong>${{counts.Critical}}</strong></div>
+        <div><span><span class="dot" style="background:var(--high)"></span>高危</span><strong>${{counts.High}}</strong></div>
+        <div><span><span class="dot" style="background:var(--medium)"></span>中危</span><strong>${{counts.Medium}}</strong></div>
+        <div><span><span class="dot" style="background:var(--low)"></span>低危</span><strong>${{counts.Low}}</strong></div>
       `;
     }}
 
