@@ -64,6 +64,44 @@
 3. Assessment Layer：风险评估层。
 4. Presentation Layer：报告表现层。
 
+### 框架流程图
+
+```mermaid
+flowchart TD
+  U[用户输入 CLI 参数] --> M[main.py]
+  M --> C[CollectionService.collect\n资产采集]
+  C --> D[DetectionService.detect\n漏洞探测]
+  D --> A[AssessmentService.assess\n风险评估]
+  A --> P[PresentationService.render\n报告呈现]
+
+  C --> C1[network scanner\n端口/服务/Banner]
+  C --> C2[crawler scanner\nURL/表单/参数]
+
+  D --> D1[Plugin Registry]
+  D1 --> D2[sqli_basic]
+  D1 --> D3[xss_reflected]
+  D1 --> D4[sensitive_path]
+  D1 --> D5[csrf_missing_token]
+  D1 --> D6[weak_password_policy]
+  D1 --> D7[suspicious_endpoint]
+  D --> D8[payload manager\n字典加载/同步]
+
+  A --> A1[RiskScore = Impact * Likelihood\n* Confidence * ExposureWeight]
+  A1 --> A2[Critical/High/Medium/Low]
+
+  P --> O1[JSON]
+  P --> O2[Markdown]
+  P --> O3[Interactive HTML]
+
+  classDef layer fill:#eaf4ff,stroke:#3572A5,stroke-width:1px,color:#1f2d3d;
+  classDef plugin fill:#eefaf1,stroke:#2f855a,stroke-width:1px,color:#1f2d3d;
+  classDef output fill:#fff7e6,stroke:#b7791f,stroke-width:1px,color:#1f2d3d;
+
+  class C,D,A,P,C1,C2,D8,A1,A2 layer;
+  class D2,D3,D4,D5,D6,D7 plugin;
+  class O1,O2,O3 output;
+```
+
 主调用链：
 
 1. `CollectionService.collect`
