@@ -10,3 +10,4 @@ wheels/
 .venv
 reports/
 example/
+.DS_Store
